@@ -1,0 +1,38 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="canvasPaint.css">
+    <title>Canvas Paint. A free online image editor!</title>
+    <meta name="author" content="Ricardo Fernandez">
+    <meta name="description" content="A basic online image editor built entirely from scratch using javascript and html canvas. Its like MSPaint but on the web.">
+</head>
+<body>
+    <header>
+        <button type="button" id="undo" onmouseup="undoRedoManager.undo()" disabled>Undo</button>
+        <button type="button" id="redo" onmouseup="undoRedoManager.redo()" disabled>Redo</button>
+        <label for="pen" >
+            <input id="pen" type="radio" name="tool" value="pen" checked="checked">Pen
+        </label>
+        <label for="line">
+            <input id="line" type="radio" name="tool" value="line">Line
+        </label>
+        <label for="square">
+            <input id="square" type="radio" name="tool" value="square">Square
+        </label>
+        <label for="circle">
+            <input id="circle" type="radio" name="tool" value="circle">Circle
+        </label>
+        
+        
+    </header>
+    <main>
+        <div id="drawing-area">
+            <canvas id="canvas" width="700px" height="400px">
+                <p>Bad news :(</p>
+                <p>An html canvas supporting browser is required to use this application</p>
+            </canvas>
+        </div>
+    </main>
+    <footer>
+        <p id="coordinates">X x Y px</p>
+    </footer>
+</body>
+    <script src="canvasPaint.js"></script>
