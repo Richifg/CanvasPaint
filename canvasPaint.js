@@ -166,7 +166,7 @@ const coordinatesManager = {
         this.y = cursorY - this.offsetY;
         
         // update the coordinates indicator as well
-        document.getElementById("coordinates").textContent = this.x + " x " + this.y + " px";    
+        document.getElementById("xy-cursor").innerText = this.x + " x " + this.y + " px";
         
         // return new coordiantes
         return [this.x, this.y];
@@ -186,9 +186,9 @@ const undoRedoManager = {
     // pushes current image into undo stack, enables button and cleans redo stack
     addUndo: function(item){
         this.undoStack.push(this.ctx.getImageData(0, 0, 700, 400));
-        document.getElementById("undo").removeAttribute("disabled");
+        document.getElementById("undo-button").removeAttribute("disabled");
         this.redoStack = [];   
-        document.getElementById("redo").setAttribute("disabled","");
+        document.getElementById("redo-button").setAttribute("disabled","");
     },
     
     // functions that perform the undo redo logic
@@ -205,7 +205,7 @@ const undoRedoManager = {
         // add about to be undoed image to redo stack and enable button
         const currentImage = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
         this.redoStack.push(currentImage);                
-        document.getElementById("redo").removeAttribute("disabled");
+        document.getElementById("redo-button").removeAttribute("disabled");
         
         // pop element from stack and restore canvas
         const lastImage = this.undoStack.pop();        
@@ -213,14 +213,14 @@ const undoRedoManager = {
         
         // disable undo button if needed
         if (!this.undoStack.length) { 
-            document.getElementById("undo").setAttribute("disabled","");
+            document.getElementById("undo-button").setAttribute("disabled","");
         }                
     },    
     redo: function(){
         // add about to be redoed image to undo stack and enable button
         const currentImage = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
         this.undoStack.push(currentImage);                
-        document.getElementById("undo").removeAttribute("disabled");
+        document.getElementById("undo-button").removeAttribute("disabled");
         
         // pop element from stack and restore canvas
         const lastImage = this.redoStack.pop();        
@@ -228,7 +228,7 @@ const undoRedoManager = {
         
         // disable redo button if needed
         if (!this.redoStack.length) { 
-            document.getElementById("redo").setAttribute("disabled","");
+            document.getElementById("redo-button").setAttribute("disabled","");
         }
     },
 };
