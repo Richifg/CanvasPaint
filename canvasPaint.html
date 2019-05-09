@@ -4,25 +4,69 @@
     <meta name="author" content="Ricardo Fernandez">
     <meta name="description" content="A basic online image editor built entirely from scratch using javascript and html canvas. Its like MSPaint but on the web.">
 </head>
+
 <body>
     <header>
-        <button type="button" id="undo" onmouseup="undoRedoManager.undo()" disabled>Undo</button>
-        <button type="button" id="redo" onmouseup="undoRedoManager.redo()" disabled>Redo</button>
-        <label for="pen" >
-            <input id="pen" type="radio" name="tool" value="pen" checked="checked">Pen
-        </label>
-        <label for="line">
-            <input id="line" type="radio" name="tool" value="line">Line
-        </label>
-        <label for="square">
-            <input id="square" type="radio" name="tool" value="square">Square
-        </label>
-        <label for="circle">
-            <input id="circle" type="radio" name="tool" value="circle">Circle
-        </label>
+        <div id="general-container" class="header-container">
+			<div id="general-buttons-container" class="buttons-container">
+				<label for="save-button">
+					<input id="save-button" type="image" src="https://bit.ly/2TZ0ne7" width="40" height="40">
+				</label>
+				<label for="undo-button">
+					<input id="undo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.undo()">
+				</label>
+				<label for="redo-button">
+					<input id="redo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.redo()">
+				</label>
+			</div>
+			<p>General</p>
+		</div>
         
+        <div id="tools-container" class="header-container">
+			<div class="buttons-container">
+				<label for="pen-button">
+					<input id="pen-button" type="radio" name="tool" value="pen" checked>
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+				<label for="eraser-button">
+					<input id="eraser-button" type="radio" name="tool" value="eraser">
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+				<label for="paint-button">
+					<input id="paint-button" type="radio" name="tool" value="paint">
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+                <label for="selector-button">
+					<input id="selector-button" type="radio" name="tool" value="selector">
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+			</div>
+			<p>Tools</p>
+		</div>
         
+        <div id="shapes-container" class="header-container">
+			<div class="buttons-container">
+				<label for="line-button">
+					<input id="line-button" type="radio" name="tool" value="line">
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+				<label for="square-button">
+					<input id="square-button" type="radio" name="tool" value="square">
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+				<label for="circle-button">
+					<input id="circle-button" type="radio" name="tool" value="circle">
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+                <label for="triangle-button">
+					<input id="triangle-button" type="radio" name="tool" value="triangle">
+					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+				</label>
+			</div>
+			<p>Shapes</p>
+		</div>
     </header>
+    
     <main>
         <div id="drawing-area">
             <canvas id="canvas" width="700px" height="400px">
@@ -31,8 +75,22 @@
             </canvas>
         </div>
     </main>
+    
     <footer>
-        <p id="coordinates">X x Y px</p>
-    </footer>
+		<div id="xy-cursor" class="footer-container">
+			<p>X x Y px</p>
+		</div>
+		<div id="xy-figure" class="footer-container">
+			<p>325 x 20 px</p>
+		</div>
+		<div id="xy-drawing-area" class="footer-container">
+			<p>350 x 350 px</p>
+		</div>
+		<div id="zoom-percentage" class="footer-container">
+			<p>- 75% +</p>
+		</div>
+	</footer>
+    
 </body>
-    <script src="canvasPaint.js"></script>
+
+<script src="canvasPaint.js"></script>
