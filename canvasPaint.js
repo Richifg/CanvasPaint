@@ -5,10 +5,10 @@ const eventManager = {
     // pen tool is selected by default
     tool: "pen",
     
-    // resizing of shapes require to keep track of states between events
-    resize: false,
+    // edit of shapes require to keep track of states between events
+    edit: "",
     
-    // checks currently selected tool and redirects the event to the appropiate function
+    // hecks currently selected tool and redirects the event to the appropiate function
     processEvent: function(event) {
         // check current tool
         const newTool = document.querySelector("input[type=radio]:checked").value;
@@ -16,7 +16,7 @@ const eventManager = {
         // tool changes require some cleanup
         if (newTool !== eventManager.tool) {
             eventManager.tool = newTool;
-            resizeBoxManager.deleteBoxes();
+            editBoxManager.deleteBoxes();
         }
         
         // delegate event to appropiate function
@@ -55,25 +55,25 @@ const eventManager = {
             case "mousedown":                
                 // check if mousedown was on resize box
                 const source = event.srcElement;
-                this.resize = source.id === "start" ? "start" : source.id === "end" ? "end" : "";  
+                this.resize = source.id === "canvas" ? "" : source.id 
                 
                 if (this.resize) {
                     // redraw current shape
                     drawingManager.drawShape(this.tool, x, y, this.resize);
                 } else {
                     // cleanup and start new shape
-                    resizeBoxManager.deleteBoxes();
+                    editBoxManager.deleteBoxes();
                     undoRedoManager.addUndo();
                     drawingManager.drawShape(this.tool, x, y, "end", true);  
                 }                
                 break;
             case "mousemove":                
                 if (event.buttons !== 0) {
-                    undoRedoManager.undo(true);
+                    undoRedoManager.softUndo();
                     if (this.resize) {
-                        // make resize boxes follow cursor and redraw shape
-                        resizeBoxManager.moveBox(x, y, this.resize);
+                        // make resize boxes follow cursor and redraw shape                        
                         drawingManager.drawShape(this.tool, x, y, this.resize);
+                        editBoxManager.moveBoxes();
                     } else {
                         // redraw current shape
                         drawingManager.drawShape(this.tool, x, y);
@@ -83,10 +83,9 @@ const eventManager = {
             case "mouseup":
                 // if not resizing create resize boxes
                 if (!this.resize) {                    
-                    // make sure click event happened on different coordinates before creaing boxes
+                    // make sure click event happened on different coordinates before creating boxes
                     if (drawingManager.start.toString() !== drawingManager.end.toString()) {
-                        resizeBoxManager.createBoxes("start");
-                        resizeBoxManager.createBoxes("end");
+                        editBoxManager.createBoxes();
                     }
                 }
                 break;
@@ -101,10 +100,11 @@ const drawingManager = {
     // render context of the canvas used fro drawing            
     ctx: undefined,
     
-    // start and end coordinates of the current drawing
-    // used on "shapes" like line and square
+    // start, end and center coordinates of the current drawing
+    // used on shapes like line, square and circle
     start: [0, 0],
-    end: [0, 0], 
+    end: [0, 0],
+    center: [0, 0],
     
     drawPen: function(x, y, begin = false){
         if (begin) {
@@ -115,27 +115,39 @@ const drawingManager = {
         this.ctx.stroke();
     },    
     drawShape: function(tool, x, y, position = "end", isBeginning = false) {
+        // update shape start on mouse down
+        if (isBeginning) {
+            this.start = [x, y];
+            this.center = [x, y];
+        }
+        // update shape start, end or both positions depending on what is being edited
+        if (position === "center") {
+            //get diff in x and y coordinates due to centere move
+            const [lastX, lastY] = [(this.start[0] + this.end[0]) / 2, (this.start[1] + this.end[1]) / 2];
+            const [diffX, diffY] = [x - lastX, y - lastY]
+            //update all coordinates
+            this.start = [this.start[0] + diffX, this.start[1] + diffY];
+            this.end = [this.end[0] + diffX, this.end[1] + diffY];
+            this.center = [x, y];            
+        } else {
+            // only update the edited position and recalculate center
+            this[position] = [x, y];
+            this.center = [(this.start[0] + this.end[0]) / 2, (this.start[1] + this.end[1]) / 2]
+        }
+        
         switch (tool) { 
-            case "line": this.drawLine(x, y, position, isBeginning); break;
-            case "square": this.drawSquare(x, y, position, isBeginning); break;
-            case "circle": this.drawCircle(x, y, position, isBeginning); break;
+            case "line": this.drawLine(); break;
+            case "square": this.drawSquare(); break;
+            case "circle": this.drawCircle(); break;
         }
     },    
-    drawLine: function(x, y, position, isBeginning) {
-        if (isBeginning) {
-            this.start = [x, y];            
-        }        
-        this[position] = [x, y];
+    drawLine: function() {               
         this.ctx.beginPath();
         this.ctx.moveTo(this.start[0], this.start[1]);
         this.ctx.lineTo(this.end[0], this.end[1]);
         this.ctx.stroke();
     },
-    drawSquare: function(x, y, position, isBeginning) {
-        if (isBeginning) {
-            this.start = [x, y];            
-        }        
-        this[position] = [x, y];
+    drawSquare: function() {  
         this.ctx.beginPath();
         this.ctx.moveTo(this.start[0], this.start[1]);
         this.ctx.lineTo(this.end[0], this.start[1]);
@@ -144,7 +156,7 @@ const drawingManager = {
         this.ctx.lineTo(this.start[0], this.start[1]);
         this.ctx.stroke();
     },
-    drawCircle: function(x, y, position, isBeginning) {
+    drawCircle: function() {
         console.log("DRAWING CIRCLE!!!");
     },
 };
@@ -192,15 +204,9 @@ const undoRedoManager = {
     },
     
     // functions that perform the undo redo logic
-    undo: function(softUndo = false){
-        // soft undo is constantly called by the shape functions when being redrawn
-        if (softUndo) {
-            this.ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);    
-            return;
-        }
-        
+    undo: function(){        
         // clean resize boxes if existent
-        resizeBoxManager.deleteBoxes();
+        editBoxManager.deleteBoxes();
         
         // add about to be undoed image to redo stack and enable button
         const currentImage = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
@@ -215,7 +221,13 @@ const undoRedoManager = {
         if (!this.undoStack.length) { 
             document.getElementById("undo-button").setAttribute("disabled","");
         }                
-    },    
+    }, 
+    softUndo: function () {
+        // soft undo is constantly called by the shape functions when being redrawn
+        // similar to regular undo but doesn't alter the stacks
+        this.ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);    
+        return;
+    },
     redo: function(){
         // add about to be redoed image to undo stack and enable button
         const currentImage = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
@@ -233,25 +245,28 @@ const undoRedoManager = {
     },
 };
 
-// stores and mantinas the resize boxes that are create fo shapes
-const resizeBoxManager = {
+// stores and maintains the edit boxes that are created for shapes
+const editBoxManager = {
     boxes: [],
     
-    // creates a resize box at the given position
-    createBoxes: function(position = "start") {                 
-        // create and style the box
-        const resizeBox = document.createElement("div");        
-        resizeBox.id = position;
-        resizeBox.className = "resize-box"        
-        
-        // locate it at the desired point (7.5 = main padding - half box size)
-        const [x, y] = drawingManager[position];                
-        resizeBox.style.left = (x + 7.5) + "px";
-        resizeBox.style.top = (y + 7.5) + "px";        
-        document.getElementById("drawing-area").appendChild(resizeBox);   
-        
-        // keep track of created boxes
-        this.boxes.push(resizeBox)
+    // creates 2 resize boxes at start and end point and 1 move box at shape center
+    createBoxes: function() {
+        const params = [["start", "resize"], ["end", "resize"], ["center", "move"]]
+        params.forEach(([position, type]) => {
+            // create box
+            const editBox = document.createElement("div");        
+            editBox.id = position;
+            editBox.className = type + "-box";        
+
+            // push it to the  desired position (7.5 = main padding - half box size)
+            const [x, y] = drawingManager[position]    
+            editBox.style.left = (x + 7.5) + "px";
+            editBox.style.top = (y + 7.5) + "px";        
+            document.getElementById("drawing-area").appendChild(editBox);   
+
+            // keep track of created boxes
+            editBoxManager.boxes.push(editBox)
+        })
     },
     
     // deletes all active resize boxes
@@ -263,12 +278,14 @@ const resizeBoxManager = {
     },
     
     // moves selected box to new coordinates
-    moveBox: function(x, y, position) {
-        const box = document.getElementById(position);
-        
-        // new position must be offset by container padding and box size
-        box.style.left = (x + 7.5) + "px";
-        box.style.top = (y + 7.5) + "px";
+    moveBoxes: function() {
+        ["start", "end", "center"].forEach((position) => {
+            // new position must be offset by container padding and box size
+            const box = document.getElementById(position);
+            const [x, y] = drawingManager[position];
+            box.style.left = (x + 7.5) + "px";
+            box.style.top = (y + 7.5) + "px";
+        })
     }
 }
 

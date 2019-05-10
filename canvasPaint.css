@@ -119,17 +119,21 @@ canvas {
     position: absolute;
 }
 
-.resize-box{    
+.resize-box, .move-box{    
     background-color: white;
     border: solid;
     border-width: 1px;
     width: 5px; 
     height: 5px;
     position: absolute;
-    cursor: n-resize;
+    cursor: nw-resize;
 }
 
-.resize-box:hover {
+.move-box {
+    cursor: move;
+}
+
+.resize-box:hover, .move-box:hover {
     background-color: cyan;
     border-color: blue;
 }
