@@ -1,5 +1,14 @@
 {
     "builds": [
-        {"src": "canvasPaint.html", "use": "@now/static"}
+        {
+            "src": "canvasPaint.html", 
+            "use": "@now/static",
+            "config": {
+            "includeFiles": [
+                "canvasPaint.css",
+                "canvasPaint.js"
+                ]
+            }
+        }
     ]
 }
