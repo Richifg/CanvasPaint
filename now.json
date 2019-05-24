@@ -11,5 +11,5 @@
         {
             "src": "canvasPaint.css",
             "use": "@now/static",
-        },
+        }
 }
