@@ -158,6 +158,12 @@ const drawingManager = {
     },
     drawCircle: function() {
         console.log("DRAWING CIRCLE!!!");
+        // find the center and radii of the elipse
+        const [cX, cY] = [(this.start[0] + this.end[0]) / 2, (this.start[1] + this.end[1]) / 2];
+        const [rX, rY] = [Math.abs(this.start[0] - cX), Math.abs(this.start[1] - cY)];
+        this.ctx.beginPath();
+        this.ctx.ellipse(cX, cY, rX, rY, 0, 0, Math.PI * 2);
+        this.ctx.stroke();        
     },
 };
 
