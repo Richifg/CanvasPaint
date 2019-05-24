@@ -1,16 +1,4 @@
 {
-    "builds": [
-        {
-            "src": "canvasPaint.html", 
-            "use": "@now/static",
-        },
-        {
-            "src": "canvasPaint.js",
-            "use": "@now/static",
-        },
-        {
-            "src": "canvasPaint.css",
-            "use": "@now/static",
-        }
-    ]
+  "version": 2,
+  "name": "canvas-paint"
 }
