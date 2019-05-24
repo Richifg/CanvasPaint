@@ -3,12 +3,13 @@
         {
             "src": "canvasPaint.html", 
             "use": "@now/static",
-            "config": {
-            "includeFiles": [
-                "canvasPaint.css",
-                "canvasPaint.js"
-                ]
-            }
-        }
-    ]
+        },
+        {
+            "src": "canvasPaint.js",
+            "use": "@now/static",
+        },
+        {
+            "src": "canvasPaint.css",
+            "use": "@now/static",
+        },
 }
