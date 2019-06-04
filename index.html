@@ -7,8 +7,8 @@
 
 <body>
     <header>
-        <div id="general-container" class="header-container">
-			<div id="general-buttons-container" class="buttons-container">
+        <div id="general-tools" class="tools-container">
+			<div id="general-tools-buttons" class="tools-containerbuttons">
 				<label for="save-button">
 					<input id="save-button" type="image" src="https://bit.ly/2TZ0ne7" width="40" height="40">
 				</label>
@@ -19,51 +19,51 @@
 					<input id="redo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.redo()">
 				</label>
 			</div>
-			<p>General</p>
+			<p class="tools-container-label">General</p>
 		</div>
         
-        <div id="tools-container" class="header-container">
-			<div class="buttons-container">
+        <div id="tools-container" class="tools-container">
+			<div class="tools-container-buttons">
 				<label for="pen-button">
 					<input id="pen-button" type="radio" name="tool" value="pen" checked>
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="assets/Icon-05.svg">
 				</label>
 				<label for="eraser-button">
 					<input id="eraser-button" type="radio" name="tool" value="eraser">
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
 				<label for="paint-button">
 					<input id="paint-button" type="radio" name="tool" value="paint">
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
                 <label for="selector-button">
 					<input id="selector-button" type="radio" name="tool" value="selector">
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
 			</div>
-			<p>Tools</p>
+			<p class="tools-container-label">Tools</p>
 		</div>
         
-        <div id="shapes-container" class="header-container">
-			<div class="buttons-container">
+        <div id="shapes-container" class="tools-container">
+			<div class="tools-container-buttons">
 				<label for="line-button">
 					<input id="line-button" type="radio" name="tool" value="line">
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="assets/Icon_Line.svg">
 				</label>
 				<label for="square-button">
 					<input id="square-button" type="radio" name="tool" value="square">
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="assets/Icon_Square.svg">
 				</label>
 				<label for="circle-button">
 					<input id="circle-button" type="radio" name="tool" value="circle">
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="assets/Icon_Circle.svg">
 				</label>
                 <label for="triangle-button">
 					<input id="triangle-button" type="radio" name="tool" value="triangle">
-					<img src="https://bit.ly/2TZ0ne7" width="25" height="25">
+					<img class="tool-icon" src="assets/Icon_Triangle.svg">
 				</label>
 			</div>
-			<p>Shapes</p>
+			<p class="tools-container-label">Shapes</p>
 		</div>
     </header>
     

@@ -3,12 +3,12 @@
     /* HEADER */
     --header-height: 100px;    
     --header-border-color: rgb(80, 80, 80);
-    --header-background-color: rgb(50,50,50);
+    --header-background-color: #171717;
     --header-font-size: 0.8em;
     --header-font-color: rgb(200,200,200);
     
     /* MAIN */
-    --main-background-color: rgb(150,150,150);
+    --main-background-color: rgb(214, 211, 211);
     --main-padding: 10px;
     
     /* FOOTER */
@@ -50,7 +50,7 @@ header {
 	box-shadow: 0 1px 5px black;
 }
 
-.header-container {
+.tools-container {
 	padding: 10px 15px;
 	display: flex;
 	flex-direction: column;
@@ -62,13 +62,13 @@ header {
 	border-width: var(--border-width);
 }
 
-.header-container p{
+.tools-container-label{
     margin: 0;
     border-width: 1px;
     font-size: var(--header-font-size);
 }
 
-.buttons-container{
+.tools-container-buttons{
 	border-width: 1px;
 	width: 55px;
 	height: 55px;
@@ -84,18 +84,27 @@ header {
 }
 
 [type=radio] {
-    width: 0px;
-    height: 0px;
+    display: none;
     position: absolute;
     opacity: 0;
 }
 
-[type=radio] + img:hover, [type=image]:hover{
-    outline: 1px solid blue
+[type=radio]:checked + .tool-icon{
+    width: 26px;
+    height: 26px;
+    outline: 1px solid cyan
 }
 
-[type=radio]:checked + img{
-    outline: 1px solid cyan
+.tool-icon {
+    width: 25px;
+    height: 25px;
+    border: none;
+}
+
+.tool-icon:hover {
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
 }
 
 /* Main Styles */
@@ -136,6 +145,8 @@ canvas {
 .resize-box:hover, .move-box:hover {
     background-color: cyan;
     border-color: blue;
+    width: 6px;
+    height: 6px;
 }
 
 /* Footer Styles */
