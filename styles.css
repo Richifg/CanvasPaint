@@ -28,7 +28,7 @@
     margin: 0;
     padding: 0;
 }
-
+    
 html, body {
     width: 100%;
     height: 100%;
@@ -50,7 +50,7 @@ header {
 	box-shadow: 0 1px 5px black;
 }
 
-.tools-container {
+.tool-group-container {
 	padding: 10px 15px;
 	display: flex;
 	flex-direction: column;
@@ -62,52 +62,99 @@ header {
 	border-width: var(--border-width);
 }
 
-.tools-container-label{
+.tool-group-buttons{
+	border-width: 1px;
+	width: 60px;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-around;
+	align-content: space-around;
+}
+
+.tool-group-label{
+   /* z-index: 15;*/
     margin: 0;
     border-width: 1px;
     font-size: var(--header-font-size);
 }
 
-.tools-container-buttons{
-	border-width: 1px;
-	width: 55px;
-	height: 55px;
-	display: flex;
-	flex-flow: row wrap;
-	justify-content: space-between;
-	align-content: space-between;
+.tool-container {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    position: relative;
 }
 
-#general-buttons-container{
-	flex-flow: column wrap;
-	width: 75px;
-}
-
-[type=radio] {
+.tool-radio {
     display: none;
-    position: absolute;
-    opacity: 0;
 }
 
-[type=radio]:checked + .tool-icon{
-    width: 26px;
-    height: 26px;
-    outline: 1px solid cyan
+.tool-radio:checked + .tool-icon,
+.tool-icon:hover{
+    width: 28px;
+    height: 28px;
+    border: 1px solid cyan;
+    border-radius: 5px;
 }
 
 .tool-icon {
     width: 25px;
     height: 25px;
-    border: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.25s;
 }
 
-.tool-icon:hover {
-    width: 26px;
-    height: 26px;
+.width-selector {
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
     cursor: pointer;
 }
 
-/* Main Styles */
+.width-selector:hover {
+    overflow: visible;
+}
+
+.width-options-container {
+    height: 60px;
+    width: 60px;
+    position: relative;
+    background-color: var(--header-background-color);
+    transition: height 0.2s;
+}
+
+.width-options-container:hover {
+    height: 200px;
+    box-shadow: 1px 2px 5px black;
+    border-radius: 5px;
+}
+
+.width-option {
+    height: 33px;
+}
+
+.width-icon {
+    height: 30px;
+    width: 75px;
+    transition: width 0.2s, height 0.25s;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+}
+
+.tool-radio[checked] + .width-icon,
+.width-icon:hover{
+    height: 33px;
+    width: 78px;
+    border: 1px solid cyan;
+    border-radius: 5px;
+}
+
+/* Drawing Area Styles */
 main {
     position: absolute;
 	top: var(--header-height);
@@ -122,13 +169,14 @@ main {
     height: 400px;
 }
 
-canvas {
+#canvas {
     background-color: white;
     box-shadow: 5px 5px 5px rgb(100,100,100);
     position: absolute;
 }
 
-.resize-box, .move-box{    
+.resize-box, 
+.move-box{    
     background-color: white;
     border: solid;
     border-width: 1px;
@@ -142,7 +190,8 @@ canvas {
     cursor: move;
 }
 
-.resize-box:hover, .move-box:hover {
+.resize-box:hover, 
+.move-box:hover {
     background-color: cyan;
     border-color: blue;
     width: 6px;

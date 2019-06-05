@@ -1,16 +1,18 @@
 <head>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Canvas Paint. A free online image editor!</title>
-    <meta name="author" content="Ricardo Fernandez">
+    <meta name="author" content="Ricardo Fernández">
     <meta name="description" content="A basic online image editor built entirely from scratch using javascript and html canvas. Its like MSPaint but on the web.">
 </head>
 
 <body>
+    <!-- Header Section -->
     <header>
-        <div id="general-tools" class="tools-container">
-			<div id="general-tools-buttons" class="tools-containerbuttons">
+        <!-- General -->
+        <div class="tool-group-container">
+			<div>
 				<label for="save-button">
-					<input id="save-button" type="image" src="https://bit.ly/2TZ0ne7" width="40" height="40">
+					<input id="save-button" type="image" src="https://bit.ly/2TZ0ne7" width="50" height="50">
 				</label>
 				<label for="undo-button">
 					<input id="undo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.undo()">
@@ -19,53 +21,94 @@
 					<input id="redo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.redo()">
 				</label>
 			</div>
-			<p class="tools-container-label">General</p>
+			<p class="tool-group-label">General</p>
 		</div>
-        
-        <div id="tools-container" class="tools-container">
-			<div class="tools-container-buttons">
-				<label for="pen-button">
-					<input id="pen-button" type="radio" name="tool" value="pen" checked>
-					<img class="tool-icon" src="assets/Icon-05.svg">
+        <!-- Tools -->  
+        <div class="tool-group-container">
+			<div class="tool-group-buttons">
+				<label class="tool-container" for="pen-button">
+					<input class="tool-radio" id="pen-button" type="radio" name="tool" value="pen" checked>
+					<img class="tool-icon" src="assets/Icon_Pen.svg">
 				</label>
-				<label for="eraser-button">
-					<input id="eraser-button" type="radio" name="tool" value="eraser">
+				<label class="tool-container" for="eraser-button">
+					<input class="tool-radio" id="eraser-button" type="radio" name="tool" value="eraser">
 					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
-				<label for="paint-button">
-					<input id="paint-button" type="radio" name="tool" value="paint">
+				<label class="tool-container" for="paint-button">
+					<input class="tool-radio" id="paint-button" type="radio" name="tool" value="paint">
 					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
-                <label for="selector-button">
-					<input id="selector-button" type="radio" name="tool" value="selector">
+                <label class="tool-container" for="selector-button">
+					<input class="tool-radio" id="selector-button" type="radio" name="tool" value="selector">
 					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
 			</div>
-			<p class="tools-container-label">Tools</p>
+			<p class="tool-group-label">Tools</p>
 		</div>
-        
-        <div id="shapes-container" class="tools-container">
-			<div class="tools-container-buttons">
-				<label for="line-button">
-					<input id="line-button" type="radio" name="tool" value="line">
+        <!-- Shapes -->
+        <div class="tool-group-container">
+			<div class="tool-group-buttons">
+				<label class="tool-container" for="line-button">
+					<input class="tool-radio" id="line-button" type="radio" name="tool" value="line">
 					<img class="tool-icon" src="assets/Icon_Line.svg">
 				</label>
-				<label for="square-button">
-					<input id="square-button" type="radio" name="tool" value="square">
+				<label class="tool-container" for="square-button">
+					<input class="tool-radio" id="square-button" type="radio" name="tool" value="square">
 					<img class="tool-icon" src="assets/Icon_Square.svg">
 				</label>
-				<label for="circle-button">
-					<input id="circle-button" type="radio" name="tool" value="circle">
+				<label class="tool-container" for="circle-button">
+					<input class="tool-radio" id="circle-button" type="radio" name="tool" value="circle">
 					<img class="tool-icon" src="assets/Icon_Circle.svg">
 				</label>
-                <label for="triangle-button">
-					<input id="triangle-button" type="radio" name="tool" value="triangle">
+                <label class="tool-container" for="triangle-button">
+					<input class="tool-radio" id="triangle-button" type="radio" name="tool" value="triangle">
 					<img class="tool-icon" src="assets/Icon_Triangle.svg">
 				</label>
 			</div>
-			<p class="tools-container-label">Shapes</p>
+			<p class="tool-group-label">Shapes</p>
 		</div>
+        <!-- Width -->
+        <div class="tool-group-container">
+            <div class="width-selector">
+                <div class="width-options-container">
+                    <img src="assets/Icon_Widths.svg" width="60px" height="60px">
+                    <label for="width-1">
+                            <input class="tool-radio" id="width-1" type="radio" name="width" value="1">
+                            <img class="width-icon" src="assets/Icon_Width1.svg">
+                     
+                    </label>
+                    <label for="asd">            
+                          <input class="tool-radio" id="asd" type="radio" name="width" value="1">
+                            <img class="width-icon" src="assets/Icon_Width2.svg">  
+ 
+                    </label>
+                    <label for="width-3">
+                            <input class="tool-radio" id="width-3" type="radio" name="width" value="1">
+                            <img class="width-icon" src="assets/Icon_Width3.svg">
+                    </label>
+                    <label for="width-4">
+                            <input class="tool-radio" id="width-4" type="radio" name="width" value="1">
+                            <img class="width-icon" src="assets/Icon_Width4.svg">
+                    </label>
+                    <label for="width-5">
+                            <input class="tool-radio" id="width-5" type="radio" name="width" value="1">
+                            <img class="width-icon" src="assets/Icon_Width5.svg">
+                       
+                    </label>
+                    <label for="width-6">
+                        <div class="width-option" >
+                            <input class="tool-radio" id="width-6" type="radio" name="width" value="1">
+                            <img class="width-icon" src="assets/Icon_Width6.svg">
+                        </div>
+                    </label>                   
+                </div>
+            </div>
+            <p class="tool-group-label"> Width</p>
+        </div>
     </header>
+    
+    
+    <!-- Drawing Area  -->
     
     <main>
         <div id="drawing-area">
@@ -75,6 +118,9 @@
             </canvas>
         </div>
     </main>
+    
+    
+    <!-- Footer Section  -->
     
     <footer>
 		<div id="xy-cursor" class="footer-container">
