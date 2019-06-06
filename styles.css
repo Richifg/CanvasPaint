@@ -36,7 +36,9 @@ html, body {
     margin: 0px;
 }
 
-/* Header Styles */
+/* =================== */
+/*     Header Styles   */
+/* =================== */
 header {
     z-index: 10;
 	position: absolute;
@@ -60,6 +62,12 @@ header {
 	border-right: solid;
 	border-color: var(--header-border-color);
 	border-width: var(--border-width);
+}
+
+.tool-group-icon {
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
 }
 
 .tool-group-buttons{
@@ -89,15 +97,7 @@ header {
     display: none;
 }
 
-.tool-radio:checked + .tool-icon,
-.tool-icon:hover{
-    width: 28px;
-    height: 28px;
-    border: 1px solid cyan;
-    border-radius: 5px;
-}
-
-.tool-icon {
+.tool-icon {    
     width: 25px;
     height: 25px;
     position: absolute;
@@ -107,54 +107,63 @@ header {
     transition: width 0.2s, height 0.25s;
 }
 
-.width-selector {
-    width: 60px;
-    height: 60px;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.width-selector:hover {
-    overflow: visible;
+/* Tool hover/select animation  */
+.tool-radio:checked + .tool-icon,
+.tool-icon:hover{
+    width: 28px;
+    height: 28px;
+    border: 1px solid cyan;
+    border-radius: 5px;
 }
 
 .width-options-container {
-    height: 60px;
-    width: 60px;
-    position: relative;
-    background-color: var(--header-background-color);
-    transition: height 0.2s;
-}
-
-.width-options-container:hover {
-    height: 200px;
-    box-shadow: 1px 2px 5px black;
+    position: absolute;
+    top: 70px;
+    overflow: hidden;
+    cursor: pointer;
+    height: 0px;
+    width: 80px;
     border-radius: 5px;
+    box-shadow: 1px 2px 5px black;    
+    background-color: var(--header-background-color);
+    display: flex;
+    flex-direction: column;
+    transition: height 0.2s;
 }
 
 .width-option {
     height: 33px;
+    width: 80px;
 }
 
 .width-icon {
     height: 30px;
-    width: 75px;
-    transition: width 0.2s, height 0.25s;
+    transition: width 0.2s, height 0.2s;
     position: relative;
     left: 50%;
     transform: translateX(-50%);
     cursor: pointer;
 }
 
-.tool-radio[checked] + .width-icon,
+/* Width options container open animation */
+.width-options-container:hover,
+.tool-group-icon:hover + .width-options-container {
+    position: absolute;
+    overflow: visible;
+    height: 200px;
+}
+
+/* Width option  hover/select animation  */
+.tool-radio:checked + .width-icon,
 .width-icon:hover{
     height: 33px;
-    width: 78px;
     border: 1px solid cyan;
     border-radius: 5px;
 }
 
+/* =================== */
 /* Drawing Area Styles */
+/* =================== */
 main {
     position: absolute;
 	top: var(--header-height);
@@ -165,7 +174,7 @@ main {
 }
 
 #drawing-area{
-    width: 700px;
+    width: 860px;
     height: 400px;
 }
 
@@ -198,7 +207,9 @@ main {
     height: 6px;
 }
 
-/* Footer Styles */
+/* =================== */
+/*     Footer Styles   */
+/* =================== */
 footer{
     position: absolute;
     bottom: 0px;
