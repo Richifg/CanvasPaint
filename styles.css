@@ -1,7 +1,7 @@
 /* Variables */
 :root{
     /* HEADER */
-    --header-height: 100px;    
+    --header-height: 110px;    
     --header-border-color: rgb(80, 80, 80);
     --header-background-color: #171717;
     --header-font-size: 0.8em;
@@ -36,6 +36,13 @@ html, body {
     margin: 0px;
 }
 
+.clmn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
 /* =================== */
 /*     Header Styles   */
 /* =================== */
@@ -52,25 +59,23 @@ header {
 	box-shadow: 0 1px 5px black;
 }
 
-.tool-group-container {
+.header-section {
 	padding: 10px 15px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	align-items: center;
 	color: var(--header-font-color);
 	border-right: solid;
 	border-color: var(--header-border-color);
 	border-width: var(--border-width);
+    font-size: var(--header-font-size);
 }
 
-.tool-group-icon {
-    cursor: pointer;
-    width: 60px;
-    height: 60px;
+.header-section-label{
+   /* z-index: 15;*/
+    margin: 0;
+    border-width: 1px;
 }
 
-.tool-group-buttons{
+/* Tools */
+.tool-group-container{
 	border-width: 1px;
 	width: 60px;
 	display: flex;
@@ -78,14 +83,7 @@ header {
 	justify-content: space-around;
 	align-content: space-around;
 }
-
-.tool-group-label{
-   /* z-index: 15;*/
-    margin: 0;
-    border-width: 1px;
-    font-size: var(--header-font-size);
-}
-
+ 
 .tool-container {
     width: 30px;
     height: 30px;
@@ -93,7 +91,7 @@ header {
     position: relative;
 }
 
-.tool-radio {
+.hidden-input {
     display: none;
 }
 
@@ -107,8 +105,7 @@ header {
     transition: width 0.2s, height 0.25s;
 }
 
-/* Tool hover/select animation  */
-.tool-radio:checked + .tool-icon,
+.hidden-input:checked + .tool-icon,
 .tool-icon:hover{
     width: 28px;
     height: 28px;
@@ -116,6 +113,7 @@ header {
     border-radius: 5px;
 }
 
+/* Width selection */
 .width-options-container {
     position: absolute;
     top: 70px;
@@ -126,39 +124,114 @@ header {
     border-radius: 5px;
     box-shadow: 1px 2px 5px black;    
     background-color: var(--header-background-color);
-    display: flex;
-    flex-direction: column;
     transition: height 0.2s;
 }
 
-.width-option {
+.width-options-icon {
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+}
+
+.width-container {
     height: 33px;
     width: 80px;
+    position: relative;
 }
 
 .width-icon {
     height: 30px;
     transition: width 0.2s, height 0.2s;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
     cursor: pointer;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-/* Width options container open animation */
 .width-options-container:hover,
-.tool-group-icon:hover + .width-options-container {
+.width-options-icon:hover + .width-options-container {
     position: absolute;
     overflow: visible;
     height: 200px;
 }
 
-/* Width option  hover/select animation  */
-.tool-radio:checked + .width-icon,
+.hidden-input:checked + .width-icon,
 .width-icon:hover{
     height: 33px;
     border: 1px solid cyan;
     border-radius: 5px;
+}
+
+/* Color selection */
+.color-selection-container {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    grid-gap: 4px;    
+    font-size: 0.9em;
+}
+
+.color-active-container {
+    cursor: pointer;
+    height: 60px;
+    width: 42px;
+    border-radius: 5px
+}
+
+.color-active {
+    border: 2px white solid;
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    background-color: red;
+    transition: height 0.2s, width 0.2s;
+}
+
+.hidden-input:checked +.color-active,
+.color-active-container:hover .color-active {
+    border-color:cyan;
+    width: 35px;
+    height: 35px;
+}
+
+.tool-radio:checked +.color-active {
+   
+}
+
+.color-options-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 19px);
+    grid-template-rows: repeat(3, 19px);
+    grid-gap: 3px;
+}
+
+.color-option {
+    border: 2px white solid;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.color-option:hover {
+    border: 2px cyan solid;
+}
+
+.color-custom {
+    background-color: white;
+}
+
+.color-picker-container {
+    cursor: pointer;
+}
+
+.color-picker {
+    border: 2px white solid;
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+}
+
+.color-picker-container:hover .color-picker{
+    border-color: cyan;
 }
 
 /* =================== */

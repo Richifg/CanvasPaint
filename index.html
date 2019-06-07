@@ -9,7 +9,7 @@
     <!-- Header Section -->
     <header>
         <!-- General -->
-        <div class="tool-group-container">
+        <div class="header-section clmn">
 			<div>
 				<label for="save-button">
 					<input id="save-button" type="image" src="https://bit.ly/2TZ0ne7" width="50" height="50">
@@ -23,89 +23,144 @@
 					<input id="redo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.redo()">
 				</label>
 			</div>
-			<p class="tool-group-label">General</p>
+			<p class="header-section-label">General</p>
 		</div>
         <!-- Tools -->  
-        <div class="tool-group-container">
-			<div class="tool-group-buttons">
+        <div class="header-section clmn">
+			<div class="tool-group-container">
 				<label class="tool-container" for="pen-button">
-					<input class="tool-radio" id="pen-button" type="radio" name="tool" value="pen" checked>
+					<input class="hidden-input" id="pen-button" type="radio" name="tool" value="pen" checked>
 					<img class="tool-icon" src="assets/Icon_Pen.svg">
 				</label>
 				<label class="tool-container" for="eraser-button">
-					<input class="tool-radio" id="eraser-button" type="radio" name="tool" value="eraser">
+					<input class="hidden-input" id="eraser-button" type="radio" name="tool" value="eraser">
 					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
 				<label class="tool-container" for="paint-button">
-					<input class="tool-radio" id="paint-button" type="radio" name="tool" value="paint">
+					<input class="hidden-input" id="paint-button" type="radio" name="tool" value="paint">
 					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
                 <label class="tool-container" for="selector-button">
-					<input class="tool-radio" id="selector-button" type="radio" name="tool" value="selector">
+					<input class="hidden-input" id="selector-button" type="radio" name="tool" value="selector">
 					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
 			</div>
-			<p class="tool-group-label">Tools</p>
+			<p class="header-section-label">Tools</p>
 		</div>
         <!-- Shapes -->
-        <div class="tool-group-container">
-			<div class="tool-group-buttons">
-				<label class="tool-container" for="line-button">
-					<input class="tool-radio" id="line-button" type="radio" name="tool" value="line">
+        <div class="header-section clmn">
+			<div class="tool-group-container">
+				<label class="tool-container">
+					<input class="hidden-input" type="radio" name="tool" value="line">
 					<img class="tool-icon" src="assets/Icon_Line.svg">
 				</label>
-				<label class="tool-container" for="square-button">
-					<input class="tool-radio" id="square-button" type="radio" name="tool" value="square">
+				<label class="tool-container">
+					<input class="hidden-input" type="radio" name="tool" value="square">
 					<img class="tool-icon" src="assets/Icon_Square.svg">
 				</label>
-				<label class="tool-container" for="circle-button">
-					<input class="tool-radio" id="circle-button" type="radio" name="tool" value="circle">
+				<label class="tool-container">
+					<input class="hidden-input" type="radio" name="tool" value="circle">
 					<img class="tool-icon" src="assets/Icon_Circle.svg">
 				</label>
-                <label class="tool-container" for="triangle-button">
-					<input class="tool-radio" id="triangle-button" type="radio" name="tool" value="triangle">
+                <label class="tool-container">
+					<input class="hidden-input" type="radio" name="tool" value="triangle">
 					<img class="tool-icon" src="assets/Icon_Triangle.svg">
 				</label>
 			</div>
-			<p class="tool-group-label">Shapes</p>
+			<p class="header-section-label">Shapes</p>
 		</div>
         <!-- Width -->
-        <div class="tool-group-container">
-            <img class="tool-group-icon" src="assets/Icon_Widths.svg">
-            <div class="width-options-container">
-                <label class="width-option" for="width-1">
-                    <input class="tool-radio" id="width-1" type="radio" name="width" value="1" checked>
+        <div class="header-section clmn">
+            <img class="width-options-icon" src="assets/Icon_Widths.svg">
+            <div class="width-options-container clmn">
+                <label class="width-container">
+                    <input class="hidden-input" type="radio" name="width" value="1" checked>
                     <img class="width-icon" src="assets/Icon_Width1.svg">                     
                 </label>
-                <label class="width-option" for="width-2">            
-                    <input class="tool-radio" id="width-2" type="radio" name="width" value="2">
+                <label class="width-container">            
+                    <input class="hidden-input" type="radio" name="width" value="2">
                     <img class="width-icon" src="assets/Icon_Width2.svg">  
                 </label>
-                <label class="width-option" for="width-3">
-                    <input class="tool-radio" id="width-3" type="radio" name="width" value="3">
+                <label class="width-container">
+                    <input class="hidden-input" type="radio" name="width" value="3">
                     <img class="width-icon" src="assets/Icon_Width3.svg">
                 </label>
-                <label class="width-option" for="width-4">
-                    <input class="tool-radio" id="width-4" type="radio" name="width" value="4">
+                <label class="width-container">
+                    <input class="hidden-input" type="radio" name="width" value="4">
                     <img class="width-icon" src="assets/Icon_Width4.svg">
                 </label>
-                <label class="width-option" for="width-5">
-                    <input class="tool-radio" id="width-5" type="radio" name="width" value="5">
+                <label class="width-container">
+                    <input class="hidden-input" type="radio" name="width" value="5">
                     <img class="width-icon" src="assets/Icon_Width5.svg">                       
                 </label>
-                <label class="width-option" for="width-6">
-                    <input class="tool-radio" id="width-6" type="radio" name="width" value="6">
+                <label class="width-container">
+                    <input class="hidden-input" type="radio" name="width" value="6">
                     <img class="width-icon" src="assets/Icon_Width6.svg">
                 </label> 
             </div>
-            <p class="tool-group-label"> Width</p>
+            <p class="header-section-label"> Width</p>
+        </div>
+        <!-- Color Selection -->
+        <div class="header-section clmn">
+            <div class="color-selection-container">
+                <label class="color-active-container clmn">
+                    <input class="hidden-input" type="radio" name="color" value="primary" checked>
+                    <div class="color-active" id="primary"></div>
+                    <p>Color 1</p>
+                </label>
+                <label class="color-active-container clmn">
+                    <input class="hidden-input" type="radio" name="color" value="secondary">
+                        <div class="color-active" id="secondary"></div>
+                        <p >Color 2</p>
+                </label>
+                <div class="color-options-grid">
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-preset"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                    <div class="color-option color-custom"></div>
+                </div>
+                <label class="color-picker-container clmn">
+                    <input class="hidden-input" type="color">
+                    <div class="color-picker">
+                        <img src="assets/Icon_Colors.svg">
+                    </div>
+                    <p>Edit colors</p>
+                </label>
+            </div>
+            <p class="header-section-label">Colors</p>
         </div>
     </header>    
     
     <!-- Drawing Area  -->    
     <main>
         <div id="drawing-area">
-            <canvas id="canvas" width="700px" height="400px">
+            <canvas id="canvas" width="700px" height="400px" oncontextmenu="return false">
                 <p>Bad news :(</p>
                 <p>An html canvas supporting browser is required to use this application</p>
             </canvas>

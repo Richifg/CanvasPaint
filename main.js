@@ -6,8 +6,12 @@ const eventManager = {
     resize: "",
     
     // redirects the event to the appropiate function
-    processEvent(event) {        
-        // delegate event to appropiate function
+    processEvent(event) {
+        // set context color on mouse down depending on clicked button
+        if (event.type === "mousedown") {
+            drawingManager.ctx.strokeStyle = event.button === 2 ? configManager.secondaryColor : configManager.primaryColor;
+        }
+        
         switch (configManager.tool) {
             case "pen": eventManager.processPenEvent(event); break;
             case "paint": eventManager.processPaintEvent(event); break;
@@ -23,7 +27,7 @@ const eventManager = {
         const [x, y] = coordinatesManager.updateCoordinates(event.clientX, event.clientY);
         
         switch(event.type){
-            case "mousedown":
+            case "mousedown":            
                 undoRedoManager.addUndo();
                 drawingManager.drawPen(x, y, true);
                 break;
@@ -197,11 +201,11 @@ const configManager = {
     
     width: 1,
     
-    primaryColor: "black",
+    primaryColor: "#000000",
     
-    secondaryColor: "white",
+    secondaryColor: "#ffffff",
     
-    updateTool(event) {
+    updateTool() {
         const currentTool = document.querySelector("input[name=tool]:checked").value
         if (configManager.tool !== currentTool) {
             configManager.tool = currentTool;
@@ -210,7 +214,7 @@ const configManager = {
         }
     },
     
-    updateWidth(event) {
+    updateWidth() {
         const currentWidth = document.querySelector("input[name=width]:checked").value;
         if (configManager.width !== currentWidth) {
             configManager.width = currentWidth;
@@ -221,6 +225,13 @@ const configManager = {
                 drawingManager.redrawShape();
             }
         }
+    },
+    
+    updateColor(event) {
+        const activeColorID = document.querySelector("input[name=color]:checked").value
+        const newColor = event.target.style.backgroundColor;
+        document.getElementById(activeColorID).style.backgroundColor = newColor;
+        configManager[activeColorID + "Color"] = newColor;
     }
 };
 
@@ -293,15 +304,16 @@ const editBoxManager = {
         const params = [["start", "resize"], ["end", "resize"], ["center", "move"]]
         params.forEach(([position, type]) => {
             // create box
-            const editBox = document.createElement("div");        
+            const editBox = document.createElement("div");
             editBox.id = position;
-            editBox.className = type + "-box";        
+            editBox.className = type + "-box";
+            editBox.addEventListener("oncontextmenu", () => { return false});
 
             // push it to the  desired position (7.5 = main padding - half box size)
-            const [x, y] = drawingManager[position]    
+            const [x, y] = drawingManager[position];
             editBox.style.left = (x + 7.5) + "px";
-            editBox.style.top = (y + 7.5) + "px";        
-            document.getElementById("drawing-area").appendChild(editBox);   
+            editBox.style.top = (y + 7.5) + "px";
+            document.getElementById("drawing-area").appendChild(editBox);
 
             // keep track of created boxes
             editBoxManager.boxes.push(editBox)
@@ -335,10 +347,27 @@ function setup(){
     drawingArea.addEventListener("mousedown", eventManager.processEvent);
     drawingArea.addEventListener("mousemove", eventManager.processEvent);
     drawingArea.addEventListener("mouseup", eventManager.processEvent);
+    
     const toolInputs = [...document.querySelectorAll("input[name=tool]")];
     toolInputs.forEach(element => element.addEventListener("change", configManager.updateTool));
+    
     const widthInputs = [...document.querySelectorAll("input[name=width]")];
     widthInputs.forEach(element => element.addEventListener("change", configManager.updateWidth));
+    
+    const colorOptions = [...document.querySelectorAll(".color-option")];
+    colorOptions.forEach(element => element.addEventListener("mouseup", configManager.updateColor));
+    
+    
+    // add preset colors to keep html clean as well
+    const presetColor = ['#000000', '#7f7f7f', '#880015', '#ed1c24', '#ff7f27',
+                        '#fff200', '#22b14c', '#00a2e8', '#3f48cc', '#a249a4',
+                        '#ffffff', '#c3c3c3', '#b97a57', '#ffafc9', '#ffc90e',
+                        '#efe4b0', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7'];
+    const presetColorElements = [...document.querySelectorAll(".color-preset")];
+    presetColorElements.forEach((element, index) => element.style.backgroundColor = presetColor[index]);
+    document.querySelector(".color-active#primary").style.backgroundColor = "#000000";
+    document.querySelector(".color-active#secondary").style.backgroundColor = "#ffffff";
+    
                             
     // provide the coordinates offset of the canvas to the coordinates manager
     const canvas = document.getElementById("canvas");
