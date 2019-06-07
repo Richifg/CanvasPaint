@@ -1,28 +1,17 @@
 
-// processes all mouse event happening inside the drawing arrea
-// keeps track of selected tool and current state
+// processes all mouse event happening inside the drawing area
 const eventManager = {
-    // pen tool is selected by default
-    tool: "pen",
+    // resize of shapes requires to keep track of which point (start,end,center)
+    // is being edited across different events.
+    resize: "",
     
-    // edit of shapes require to keep track of states between events
-    edit: "",
-    
-    // hecks currently selected tool and redirects the event to the appropiate function
-    processEvent: function(event) {
-        // check current tool
-        const newTool = document.querySelector("input[type=radio]:checked").value;
-        
-        // tool changes require some cleanup
-        if (newTool !== eventManager.tool) {
-            eventManager.tool = newTool;
-            editBoxManager.deleteBoxes();
-        }
-        
+    // redirects the event to the appropiate function
+    processEvent(event) {        
         // delegate event to appropiate function
-        switch (newTool) {
+        switch (configManager.tool) {
             case "pen": eventManager.processPenEvent(event); break;
-            case "pain": eventManager.processPaintEvent(event); break;
+            case "paint": eventManager.processPaintEvent(event); break;
+            case "eraser": eventManager.processEraserEvent(event); break;
             case "line":
             case "circle":
             case "square": eventManager.processShapeEvent(event); break;
@@ -30,7 +19,7 @@ const eventManager = {
         event.stopPropagation();
     }, 
     
-    processPenEvent: function(event) {
+    processPenEvent(event) {
         const [x, y] = coordinatesManager.updateCoordinates(event.clientX, event.clientY);
         
         switch(event.type){
@@ -46,10 +35,14 @@ const eventManager = {
         }
     },
     
-    processShapeEvent: function(event) {
+    processPaintEvent(event) {},
+    
+    processEraserEvent(event) {},
+    
+    processShapeEvent(event) {
         // get current cursor coordinates and selected tool
         const [x, y] = coordinatesManager.updateCoordinates(event.clientX, event.clientY);
-        const tool = this.tool;
+        const tool = configManager.tool;
               
         switch(event.type){
             case "mousedown":                
@@ -59,12 +52,12 @@ const eventManager = {
                 
                 if (this.resize) {
                     // redraw current shape
-                    drawingManager.drawShape(this.tool, x, y, this.resize);
+                    drawingManager.drawShape(tool, x, y, this.resize);
                 } else {
                     // cleanup and start new shape
                     editBoxManager.deleteBoxes();
                     undoRedoManager.addUndo();
-                    drawingManager.drawShape(this.tool, x, y, "end", true);  
+                    drawingManager.drawShape(tool, x, y, "end", true);  
                 }                
                 break;
             case "mousemove":                
@@ -72,11 +65,11 @@ const eventManager = {
                     undoRedoManager.softUndo();
                     if (this.resize) {
                         // make resize boxes follow cursor and redraw shape                        
-                        drawingManager.drawShape(this.tool, x, y, this.resize);
+                        drawingManager.drawShape(tool, x, y, this.resize);
                         editBoxManager.moveBoxes();
                     } else {
                         // redraw current shape
-                        drawingManager.drawShape(this.tool, x, y);
+                        drawingManager.drawShape(tool, x, y);
                     }
                 }
                 break;
@@ -91,13 +84,11 @@ const eventManager = {
                 break;
         }
     },
-        
-    processPaintEvent: function(event) {},
 };
 
 // draws on the canvas
 const drawingManager = {
-    // render context of the canvas used fro drawing            
+    // render context of the canvas (initialized on setup)      
     ctx: undefined,
     
     // start, end and center coordinates of the current drawing
@@ -106,7 +97,7 @@ const drawingManager = {
     end: [0, 0],
     center: [0, 0],
     
-    drawPen: function(x, y, begin = false){
+    drawPen(x, y, begin = false){
         if (begin) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, y);            
@@ -114,7 +105,7 @@ const drawingManager = {
         this.ctx.lineTo(x, y);
         this.ctx.stroke();
     },    
-    drawShape: function(tool, x, y, position = "end", isBeginning = false) {
+    drawShape(tool, x, y, position = "end", isBeginning = false) {
         // update shape start on mouse down
         if (isBeginning) {
             this.start = [x, y];
@@ -141,35 +132,44 @@ const drawingManager = {
             case "circle": this.drawCircle(); break;
         }
     },    
-    drawLine: function() {               
+    drawLine() {               
         this.ctx.beginPath();
         this.ctx.moveTo(this.start[0], this.start[1]);
         this.ctx.lineTo(this.end[0], this.end[1]);
         this.ctx.stroke();
     },
-    drawSquare: function() {  
+    drawSquare() {
+        // not using strokeRect due to weird behavior at the meeting point of the square lines
         this.ctx.beginPath();
         this.ctx.moveTo(this.start[0], this.start[1]);
         this.ctx.lineTo(this.end[0], this.start[1]);
         this.ctx.lineTo(this.end[0], this.end[1]);
         this.ctx.lineTo(this.start[0], this.end[1]);
         this.ctx.lineTo(this.start[0], this.start[1]);
+        this.ctx.lineTo(this.end[0], this.start[1]);
         this.ctx.stroke();
     },
-    drawCircle: function() {
-        console.log("DRAWING CIRCLE!!!");
-        // find the center and radii of the elipse
+    drawCircle() {
+        // center and radii of the elipse
         const [cX, cY] = [(this.start[0] + this.end[0]) / 2, (this.start[1] + this.end[1]) / 2];
         const [rX, rY] = [Math.abs(this.start[0] - cX), Math.abs(this.start[1] - cY)];
+        
         this.ctx.beginPath();
         this.ctx.ellipse(cX, cY, rX, rY, 0, 0, Math.PI * 2);
         this.ctx.stroke();        
     },
+    
+    redrawShape() {
+        undoRedoManager.softUndo();
+        this.ctx.stroke();
+    }
+    
+    
 };
 
 // stores and updates the x/y coordinates of the cursor on the canvas
 const coordinatesManager = {
-    //current coordiantes of the cursor on client
+    //current coordinates of the cursor on client
     x: 0,
     y: 0,
     
@@ -178,7 +178,7 @@ const coordinatesManager = {
     offsetY: 0,
     
     // updates internal coordinates and displays them on screen
-    updateCoordinates: function(cursorX, cursorY){
+    updateCoordinates(cursorX, cursorY){
         // update coordinates to the cursor
         this.x = cursorX - this.offsetX;
         this.y = cursorY - this.offsetY;
@@ -191,9 +191,42 @@ const coordinatesManager = {
     },
 };
 
+// keeps track of selected tool, width and colors
+const configManager = {
+    tool: "pen",
+    
+    width: 1,
+    
+    primaryColor: "black",
+    
+    secondaryColor: "white",
+    
+    updateTool(event) {
+        const currentTool = document.querySelector("input[name=tool]:checked").value
+        if (configManager.tool !== currentTool) {
+            configManager.tool = currentTool;
+            // cleanup in case a shape was being drawn
+            editBoxManager.deleteBoxes();
+        }
+    },
+    
+    updateWidth(event) {
+        const currentWidth = document.querySelector("input[name=width]:checked").value;
+        if (configManager.width !== currentWidth) {
+            configManager.width = currentWidth;
+            drawingManager.ctx.lineWidth = currentWidth;
+            
+            // check if a shape is currently being drawn and redraw it with new width
+            if (["line", "square", "circle", "triangle"].indexOf(configManager.tool) !== -1) {
+                drawingManager.redrawShape();
+            }
+        }
+    }
+};
+
 // stores and mantains the undo/redo stack
 const undoRedoManager = {
-    // size and render context of the canvas
+    // size and render context of the canvas (initialized on setup)
     ctx: undefined,
     size: [0, 0],
     
@@ -202,15 +235,15 @@ const undoRedoManager = {
     redoStack: [],    
     
     // pushes current image into undo stack, enables button and cleans redo stack
-    addUndo: function(item){
+    addUndo(item){
         this.undoStack.push(this.ctx.getImageData(0, 0, 700, 400));
         document.getElementById("undo-button").removeAttribute("disabled");
         this.redoStack = [];   
         document.getElementById("redo-button").setAttribute("disabled","");
     },
     
-    // functions that perform the undo redo logic
-    undo: function(){        
+    // undo redo logic
+    undo(){        
         // clean resize boxes if existent
         editBoxManager.deleteBoxes();
         
@@ -228,13 +261,13 @@ const undoRedoManager = {
             document.getElementById("undo-button").setAttribute("disabled","");
         }                
     }, 
-    softUndo: function () {
+    softUndo() {
         // soft undo is constantly called by the shape functions when being redrawn
         // similar to regular undo but doesn't alter the stacks
         this.ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);    
         return;
     },
-    redo: function(){
+    redo(){
         // add about to be redoed image to undo stack and enable button
         const currentImage = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
         this.undoStack.push(currentImage);                
@@ -256,7 +289,7 @@ const editBoxManager = {
     boxes: [],
     
     // creates 2 resize boxes at start and end point and 1 move box at shape center
-    createBoxes: function() {
+    createBoxes() {
         const params = [["start", "resize"], ["end", "resize"], ["center", "move"]]
         params.forEach(([position, type]) => {
             // create box
@@ -276,7 +309,7 @@ const editBoxManager = {
     },
     
     // deletes all active resize boxes
-    deleteBoxes: function() {         
+    deleteBoxes() {         
         while (this.boxes.length) {
             const box = this.boxes.pop();
             box.parentElement.removeChild(box);            
@@ -284,7 +317,7 @@ const editBoxManager = {
     },
     
     // moves selected box to new coordinates
-    moveBoxes: function() {
+    moveBoxes() {
         ["start", "end", "center"].forEach((position) => {
             // new position must be offset by container padding and box size
             const box = document.getElementById(position);
@@ -297,11 +330,15 @@ const editBoxManager = {
 
 // intializes some manager variables after the document is loaded
 function setup(){
-    // add the mouse event listerners to the drawing area    
+    // add event listeners to keep html clean  
     const drawingArea = document.getElementById("drawing-area");
     drawingArea.addEventListener("mousedown", eventManager.processEvent);
     drawingArea.addEventListener("mousemove", eventManager.processEvent);
     drawingArea.addEventListener("mouseup", eventManager.processEvent);
+    const toolInputs = [...document.querySelectorAll("input[name=tool]")];
+    toolInputs.forEach(element => element.addEventListener("change", configManager.updateTool));
+    const widthInputs = [...document.querySelectorAll("input[name=width]")];
+    widthInputs.forEach(element => element.addEventListener("change", configManager.updateWidth));
                             
     // provide the coordinates offset of the canvas to the coordinates manager
     const canvas = document.getElementById("canvas");

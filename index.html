@@ -14,9 +14,11 @@
 				<label for="save-button">
 					<input id="save-button" type="image" src="https://bit.ly/2TZ0ne7" width="50" height="50">
 				</label>
+                
 				<label for="undo-button">
 					<input id="undo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.undo()">
 				</label>
+                
 				<label for="redo-button">
 					<input id="redo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.redo()">
 				</label>
@@ -72,7 +74,7 @@
             <img class="tool-group-icon" src="assets/Icon_Widths.svg">
             <div class="width-options-container">
                 <label class="width-option" for="width-1">
-                    <input class="tool-radio" id="width-1" type="radio" name="width" value="1">
+                    <input class="tool-radio" id="width-1" type="radio" name="width" value="1" checked>
                     <img class="width-icon" src="assets/Icon_Width1.svg">                     
                 </label>
                 <label class="width-option" for="width-2">            
@@ -98,11 +100,9 @@
             </div>
             <p class="tool-group-label"> Width</p>
         </div>
-    </header>
+    </header>    
     
-    
-    <!-- Drawing Area  -->
-    
+    <!-- Drawing Area  -->    
     <main>
         <div id="drawing-area">
             <canvas id="canvas" width="700px" height="400px">
@@ -111,10 +111,8 @@
             </canvas>
         </div>
     </main>
-    
-    
+        
     <!-- Footer Section  -->
-    
     <footer>
 		<div id="xy-cursor" class="footer-container">
 			<p>X x Y px</p>
