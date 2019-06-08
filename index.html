@@ -10,17 +10,22 @@
     <header>
         <!-- General -->
         <div class="header-section clmn">
-			<div>
-				<label for="save-button">
-					<input id="save-button" type="image" src="https://bit.ly/2TZ0ne7" width="50" height="50">
+			<div class="tool-group-container">
+                <label class="tool-container">
+					<input class="hidden-input" id="undo-button" type="image">
+                    <img class="tool-icon" src="https://bit.ly/2TZ0ne7">
+                </label>
+				<label class="tool-container">                
+					<input class="hidden-input" id="redo-button" type="image">
+                    <img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
-                
-				<label for="undo-button">
-					<input id="undo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.undo()">
-				</label>
-                
-				<label for="redo-button">
-					<input id="redo-button" type="image" src="https://bit.ly/2TZ0ne7" width="25" height="25" onmouseup="undoRedoManager.redo()">
+				<label class="tool-container">
+                    <input class="hidden-input" id="undo-button" onclick="undoRedoManager.undo()">
+                    <img class="tool-icon" src="assets/Icon_Undo.svg">
+                </label>
+				<label class="tool-container">                
+					<input class="hidden-input" id="redo-button" onclick="undoRedoManager.redo()">
+                    <img class="tool-icon" src="assets/Icon_Redo.svg">
 				</label>
 			</div>
 			<p class="header-section-label">General</p>
