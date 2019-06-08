@@ -205,6 +205,8 @@ const configManager = {
     
     secondaryColor: "#ffffff",
     
+    customColors: Array(10).fill("#ffffff"),
+    
     updateTool() {
         const currentTool = document.querySelector("input[name=tool]:checked").value
         if (configManager.tool !== currentTool) {
@@ -232,6 +234,14 @@ const configManager = {
         const newColor = event.target.style.backgroundColor;
         document.getElementById(activeColorID).style.backgroundColor = newColor;
         configManager[activeColorID + "Color"] = newColor;
+    },
+    
+    addNewColor(event) {
+        const newColor = event.target.value;
+        configManager.customColors.pop();
+        configManager.customColors.unshift(newColor);
+        const customColors = [...document.querySelectorAll(".color-custom")];
+        customColors.forEach((element, index) => element.style.backgroundColor = configManager.customColors[index]);
     }
 };
 
@@ -356,6 +366,9 @@ function setup(){
     
     const colorOptions = [...document.querySelectorAll(".color-option")];
     colorOptions.forEach(element => element.addEventListener("mouseup", configManager.updateColor));
+    
+    const colorInput = document.querySelector("input[type=color]");
+    colorInput.addEventListener("change", configManager.addNewColor);
     
     
     // add preset colors to keep html clean as well
