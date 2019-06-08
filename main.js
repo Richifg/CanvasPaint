@@ -1,5 +1,5 @@
 
-// processes all mouse event happening inside the drawing area
+// processes all mouse events happening inside the drawing area
 const eventManager = {
     // resize of shapes requires to keep track of which point (start,end,center)
     // is being edited across different events.
@@ -18,6 +18,7 @@ const eventManager = {
             case "eraser": eventManager.processEraserEvent(event); break;
             case "line":
             case "circle":
+            case "triangle":
             case "square": eventManager.processShapeEvent(event); break;
         }
         event.stopPropagation();
@@ -117,9 +118,10 @@ const drawingManager = {
         }
         // update shape start, end or both positions depending on what is being edited
         if (position === "center") {
-            //get diff in x and y coordinates due to centere move
+            //get diff in x and y coordinates due to center move
             const [lastX, lastY] = [(this.start[0] + this.end[0]) / 2, (this.start[1] + this.end[1]) / 2];
             const [diffX, diffY] = [x - lastX, y - lastY]
+            
             //update all coordinates
             this.start = [this.start[0] + diffX, this.start[1] + diffY];
             this.end = [this.end[0] + diffX, this.end[1] + diffY];
@@ -134,6 +136,7 @@ const drawingManager = {
             case "line": this.drawLine(); break;
             case "square": this.drawSquare(); break;
             case "circle": this.drawCircle(); break;
+            case "triangle": this.drawTriangle(); break;
         }
     },    
     drawLine() {               
@@ -150,17 +153,32 @@ const drawingManager = {
         this.ctx.lineTo(this.end[0], this.end[1]);
         this.ctx.lineTo(this.start[0], this.end[1]);
         this.ctx.lineTo(this.start[0], this.start[1]);
+        // last line used to force line caps to meet properly
         this.ctx.lineTo(this.end[0], this.start[1]);
         this.ctx.stroke();
     },
     drawCircle() {
         // center and radii of the elipse
-        const [cX, cY] = [(this.start[0] + this.end[0]) / 2, (this.start[1] + this.end[1]) / 2];
+        const [cX, cY] = [...this.center];
         const [rX, rY] = [Math.abs(this.start[0] - cX), Math.abs(this.start[1] - cY)];
         
         this.ctx.beginPath();
         this.ctx.ellipse(cX, cY, rX, rY, 0, 0, Math.PI * 2);
         this.ctx.stroke();        
+    },
+    drawTriangle() {
+        const p1 = [this.center[0], this.start[1]];
+        const p2 = [this.start[0], this.end[1]];
+        const p3 = [...this.end];
+        
+        this.ctx.beginPath();       
+        this.ctx.moveTo(...p1);
+        this.ctx.lineTo(...p2);
+        this.ctx.lineTo(...p3);
+        this.ctx.lineTo(...p1);
+        // last line used to force line caps to meet properly
+        this.ctx.lineTo(...p2);
+        this.ctx.stroke();      
     },
     
     redrawShape() {
