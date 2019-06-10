@@ -260,6 +260,8 @@ const configManager = {
         configManager.customColors.unshift(newColor);
         const customColors = [...document.querySelectorAll(".color-custom")];
         customColors.forEach((element, index) => element.style.backgroundColor = configManager.customColors[index]);
+        // simulate an event to recycle updateColor function 
+        configManager.updateColor({target : {style: {backgroundColor: newColor}}});
     }
 };
 
