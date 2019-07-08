@@ -10,7 +10,8 @@ const eventManager = {
     resize: "",
     
     // redirects the event to the appropiate function
-    processEvent(event) {        
+    processEvent(event) {
+        console.log('undo count: ' + undoRedoManager.undoStack.length + ' ' + 'redo count: ' + undoRedoManager.redoStack.length);
         if (event.type === "mousedown") {
             const targetClass = event.target.className;
             if (targetClass.includes("canvas")) {
@@ -107,14 +108,21 @@ const eventManager = {
     },
     
     processCanvasEvent(event) {        
+        if (event.type === "mousedown") {
+            // save current drawing
+            undoRedoManager.addUndo();
+        }        
         const [x, y] = coordinatesManager.updateCoordinates(event.clientX, event.clientY);
         const boxType = this.resize;
         const width = boxType === "corner" || boxType === "right" ? x : null;
         const height = boxType === "corner" || boxType === "bottom" ? y : null;
                 
         canvasManager.resizeCanvas(width, height);
-        if (event.type === "mouseup") {
+        undoRedoManager.softUndo();
+        
+        if (event.type === "mouseup") {            
             this.resize = "";
+            undoRedoManager.undoStack.pop();
         }
     }
 };
@@ -303,8 +311,8 @@ const undoRedoManager = {
     redoStack: [],    
     
     // pushes current image into undo stack, enables button and cleans redo stack
-    addUndo(item){
-        this.undoStack.push(this.ctx.getImageData(0, 0, 700, 400));
+    addUndo(){
+        this.undoStack.push(this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height));
         document.getElementById("undo-button").removeAttribute("disabled");
         this.redoStack = [];   
         document.getElementById("redo-button").setAttribute("disabled","");
@@ -316,7 +324,7 @@ const undoRedoManager = {
         editBoxManager.deleteBoxes();
         
         // add about to be undoed image to redo stack and enable button
-        const currentImage = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
+        const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
         this.redoStack.push(currentImage);                
         document.getElementById("redo-button").removeAttribute("disabled");
         
@@ -329,15 +337,16 @@ const undoRedoManager = {
             document.getElementById("undo-button").setAttribute("disabled","");
         }                
     }, 
-    softUndo() {
-        // soft undo is constantly called by the shape functions when being redrawn
+    softUndo() {        
+        // called by the shape functions when being redrawn
         // similar to regular undo but doesn't alter the stacks
-        this.ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);    
-        return;
+        if (this.undoStack.length) {
+            this.ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);
+        }
     },
     redo(){
         // add about to be redoed image to undo stack and enable button
-        const currentImage = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
+        const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
         this.undoStack.push(currentImage);                
         document.getElementById("undo-button").removeAttribute("disabled");
         
@@ -442,7 +451,8 @@ const canvasManager = {
         this.bottomBox.style.left = (globals.boxOffset + this.width / 2) + "px";
     },
     
-    resizeCanvas(width, height) {        
+    resizeCanvas(width, height) {
+        // resize canvas
         const canvas = document.getElementById("canvas");
         if (width) {
             canvas.width = width;
@@ -460,7 +470,7 @@ const canvasManager = {
 
 // intializes some manager variables after the document is loaded
 function setup(){
-    // add event listeners to keep html clean  
+    // add event listeners here to keep html clean  
     const drawingArea = document.getElementById("drawing-area");
     drawingArea.addEventListener("mousedown", event => eventManager.processEvent(event));
     drawingArea.addEventListener("mousemove", event => eventManager.processEvent(event));
@@ -502,6 +512,5 @@ function setup(){
     ctx.lineCap = "round";
     drawingManager.ctx = ctx
     undoRedoManager.ctx = ctx;
-    undoRedoManager.size = [canvas.width, canvas.height];
 }
 setup();
