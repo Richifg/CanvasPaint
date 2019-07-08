@@ -28,7 +28,7 @@
                     <img class="tool-icon" src="assets/Icon_Redo.svg">
 				</label>
 			</div>
-			<p class="header-section-label">General</p>
+			<p>General</p>
 		</div>
         <!-- Tools -->  
         <div class="header-section clmn">
@@ -50,7 +50,7 @@
 					<img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
 			</div>
-			<p class="header-section-label">Tools</p>
+			<p>Tools</p>
 		</div>
         <!-- Shapes -->
         <div class="header-section clmn">
@@ -72,7 +72,7 @@
 					<img class="tool-icon" src="assets/Icon_Triangle.svg">
 				</label>
 			</div>
-			<p class="header-section-label">Shapes</p>
+			<p>Shapes</p>
 		</div>
         <!-- Width -->
         <div class="header-section clmn">
@@ -83,27 +83,27 @@
                     <img class="width-icon" src="assets/Icon_Width1.svg">                     
                 </label>
                 <label class="width-container">            
-                    <input class="hidden-input" type="radio" name="width" value="2">
+                    <input class="hidden-input" type="radio" name="width" value="3">
                     <img class="width-icon" src="assets/Icon_Width2.svg">  
                 </label>
                 <label class="width-container">
-                    <input class="hidden-input" type="radio" name="width" value="3">
+                    <input class="hidden-input" type="radio" name="width" value="5">
                     <img class="width-icon" src="assets/Icon_Width3.svg">
                 </label>
                 <label class="width-container">
-                    <input class="hidden-input" type="radio" name="width" value="4">
+                    <input class="hidden-input" type="radio" name="width" value="7">
                     <img class="width-icon" src="assets/Icon_Width4.svg">
                 </label>
                 <label class="width-container">
-                    <input class="hidden-input" type="radio" name="width" value="5">
+                    <input class="hidden-input" type="radio" name="width" value="9">
                     <img class="width-icon" src="assets/Icon_Width5.svg">                       
                 </label>
                 <label class="width-container">
-                    <input class="hidden-input" type="radio" name="width" value="6">
+                    <input class="hidden-input" type="radio" name="width" value="13">
                     <img class="width-icon" src="assets/Icon_Width6.svg">
                 </label> 
             </div>
-            <p class="header-section-label"> Width</p>
+            <p>Width</p>
         </div>
         <!-- Color Selection -->
         <div class="header-section clmn">
@@ -111,12 +111,12 @@
                 <label class="color-active-container clmn">
                     <input class="hidden-input" type="radio" name="color" value="primary" checked>
                     <div class="color-active" id="primary"></div>
-                    <p>Color 1</p>
+                    <p>LMB</p>
                 </label>
                 <label class="color-active-container clmn">
                     <input class="hidden-input" type="radio" name="color" value="secondary">
-                        <div class="color-active" id="secondary"></div>
-                        <p >Color 2</p>
+                    <div class="color-active" id="secondary"></div>
+                    <p>RMB</p>
                 </label>
                 <div class="color-options-grid">
                     <div class="color-option color-preset"></div>
@@ -158,14 +158,14 @@
                     <p>Edit colors</p>
                 </label>
             </div>
-            <p class="header-section-label">Colors</p>
+            <p>Colors</p>
         </div>
     </header>    
     
     <!-- Drawing Area  -->    
     <main>
         <div id="drawing-area">
-            <canvas id="canvas" width="700px" height="400px" oncontextmenu="return false">
+            <canvas id="canvas" oncontextmenu="return false">
                 <p>Bad news :(</p>
                 <p>An html canvas supporting browser is required to use this application</p>
             </canvas>
@@ -181,7 +181,7 @@
 			<p>325 x 20 px</p>
 		</div>
 		<div id="xy-drawing-area" class="footer-container">
-			<p>350 x 350 px</p>
+			<p>700 x 400 px</p>
 		</div>
 		<div id="zoom-percentage" class="footer-container">
 			<p>- 75% +</p>

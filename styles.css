@@ -41,6 +41,7 @@ html, body {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    text-align: center;
 }
 
 .row {
@@ -73,12 +74,6 @@ header {
 	border-color: var(--header-border-color);
 	border-width: var(--border-width);
     font-size: var(--header-font-size);
-}
-
-.header-section-label{
-   /* z-index: 15;*/
-    margin: 0;
-    border-width: 1px;
 }
 
 /* Tools */
@@ -253,10 +248,10 @@ main {
 	background-color: var(--main-background-color);
 }
 
-#drawing-area{
-    width: 860px;
-    height: 400px;
-}
+#drawing-area {
+    width: 100%;
+    height: 100%;
+}   
 
 #canvas {
     background-color: white;
@@ -264,14 +259,23 @@ main {
     position: absolute;
 }
 
-.resize-box, 
-.move-box{    
+.box, .canvas-box{    
     background-color: white;
     border: solid;
     border-width: 1px;
     width: 5px; 
     height: 5px;
     position: absolute;
+}
+
+.box:hover, .canvas-box:hover {
+    background-color: cyan;
+    border-color: blue;
+    width: 6px;
+    height: 6px;
+}
+
+.resize-box, .corner-box{
     cursor: nw-resize;
 }
 
@@ -279,13 +283,14 @@ main {
     cursor: move;
 }
 
-.resize-box:hover, 
-.move-box:hover {
-    background-color: cyan;
-    border-color: blue;
-    width: 6px;
-    height: 6px;
+.right-box {
+    cursor: col-resize;
 }
+
+.bottom-box {
+    cursor: row-resize;
+}
+
 
 /* =================== */
 /*     Footer Styles   */

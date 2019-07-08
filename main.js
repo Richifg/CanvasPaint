@@ -1,25 +1,39 @@
+const globals = {
+    // main padding - half box size
+    boxOffset: 7.5,
+};
 
 // processes all mouse events happening inside the drawing area
 const eventManager = {
-    // resize of shapes requires to keep track of which point (start,end,center)
-    // is being edited across different events.
+    // resive of canvas and shapes requires to keep track of which 
+    // points is being edited through events
     resize: "",
     
     // redirects the event to the appropiate function
-    processEvent(event) {
-        // set context color on mouse down depending on clicked button
+    processEvent(event) {        
         if (event.type === "mousedown") {
-            drawingManager.ctx.strokeStyle = event.button === 2 ? configManager.secondaryColor : configManager.primaryColor;
+            const targetClass = event.target.className;
+            if (targetClass.includes("canvas")) {
+                this.resize = targetClass.split(" ")[0].split("-")[0];
+            } else {
+                drawingManager.ctx.strokeStyle = event.button === 2 
+                    ? configManager.secondaryColor
+                    : configManager.primaryColor;
+            }
         }
         
-        switch (configManager.tool) {
-            case "pen": eventManager.processPenEvent(event); break;
-            case "paint": eventManager.processPaintEvent(event); break;
-            case "eraser": eventManager.processEraserEvent(event); break;
-            case "line":
-            case "circle":
-            case "triangle":
-            case "square": eventManager.processShapeEvent(event); break;
+        if (["corner", "right", "bottom"].includes(this.resize)) {
+            this.processCanvasEvent(event);
+        } else {
+            switch (configManager.tool) {
+                case "pen": this.processPenEvent(event); break;
+                case "paint": this.processPaintEvent(event); break;
+                case "eraser": this.processEraserEvent(event); break;
+                case "line":
+                case "circle":
+                case "triangle":
+                case "square": this.processShapeEvent(event); break;
+            }
         }
         event.stopPropagation();
     }, 
@@ -53,7 +67,9 @@ const eventManager = {
             case "mousedown":                
                 // check if mousedown was on resize box
                 const source = event.srcElement;
-                this.resize = source.id === "canvas" ? "" : source.id 
+                this.resize = source.id === "canvas"
+                    ? ""
+                    : source.id 
                 
                 if (this.resize) {
                     // redraw current shape
@@ -89,6 +105,18 @@ const eventManager = {
                 break;
         }
     },
+    
+    processCanvasEvent(event) {        
+        const [x, y] = coordinatesManager.updateCoordinates(event.clientX, event.clientY);
+        const boxType = this.resize;
+        const width = boxType === "corner" || boxType === "right" ? x : null;
+        const height = boxType === "corner" || boxType === "bottom" ? y : null;
+                
+        canvasManager.resizeCanvas(width, height);
+        if (event.type === "mouseup") {
+            this.resize = "";
+        }
+    }
 };
 
 // draws on the canvas
@@ -185,8 +213,6 @@ const drawingManager = {
         undoRedoManager.softUndo();
         this.ctx.stroke();
     }
-    
-    
 };
 
 // stores and updates the x/y coordinates of the cursor on the canvas
@@ -251,6 +277,7 @@ const configManager = {
         const activeColorID = document.querySelector("input[name=color]:checked").value
         const newColor = event.target.style.backgroundColor;
         document.getElementById(activeColorID).style.backgroundColor = newColor;
+        document.querySelector("input[type=color]").value = newColor;
         configManager[activeColorID + "Color"] = newColor;
     },
     
@@ -265,7 +292,7 @@ const configManager = {
     }
 };
 
-// stores and mantains the undo/redo stack
+// mantains the undo/redo stack
 const undoRedoManager = {
     // size and render context of the canvas (initialized on setup)
     ctx: undefined,
@@ -325,7 +352,7 @@ const undoRedoManager = {
     },
 };
 
-// stores and maintains the edit boxes that are created for shapes
+// manages the edit boxes that are created for shapes
 const editBoxManager = {
     boxes: [],
     
@@ -336,13 +363,12 @@ const editBoxManager = {
             // create box
             const editBox = document.createElement("div");
             editBox.id = position;
-            editBox.className = type + "-box";
-            editBox.addEventListener("oncontextmenu", () => { return false});
+            editBox.className = type + "-box box";
 
-            // push it to the  desired position (7.5 = main padding - half box size)
+            // push it to the desired position
             const [x, y] = drawingManager[position];
-            editBox.style.left = (x + 7.5) + "px";
-            editBox.style.top = (y + 7.5) + "px";
+            editBox.style.left = (x + globals.boxOffset) + "px";
+            editBox.style.top = (y + globals.boxOffset) + "px";
             document.getElementById("drawing-area").appendChild(editBox);
 
             // keep track of created boxes
@@ -364,9 +390,71 @@ const editBoxManager = {
             // new position must be offset by container padding and box size
             const box = document.getElementById(position);
             const [x, y] = drawingManager[position];
-            box.style.left = (x + 7.5) + "px";
-            box.style.top = (y + 7.5) + "px";
+            box.style.left = (x + globals.boxOffset) + "px";
+            box.style.top = (y + globals.boxOffset) + "px";
         })
+    }
+}
+
+// manages the size of canvas
+const canvasManager = {
+    // initial canvas size
+    width: 700,
+    height: 400,
+        
+    rightBox: null,
+    bottomBox: null,
+    cornerBox: null,
+    
+    init() {
+        const canvas = document.getElementById("canvas");
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.createBoxes();
+        this.moveBoxes();
+    },
+    
+    createBoxes() {
+        const drawingArea = document.getElementById("drawing-area");
+        
+        const rightBox = document.createElement("div");
+        rightBox.className = "right-box canvas-box";
+        drawingArea.appendChild(rightBox)
+        this.rightBox = rightBox;
+        
+        const bottomBox = document.createElement("div");
+        bottomBox.className = "bottom-box canvas-box";
+        drawingArea.appendChild(bottomBox);
+        this.bottomBox = bottomBox;
+        
+        const cornerBox = document.createElement("div");
+        cornerBox.className = "corner-box canvas-box";
+        drawingArea.appendChild(cornerBox);
+        this.cornerBox = cornerBox;
+    },
+                
+    moveBoxes() {
+        this.cornerBox.style.top = (globals.boxOffset + this.height) + "px";
+        this.cornerBox.style.left = (globals.boxOffset + this.width) + "px";
+        this.rightBox.style.top = (globals.boxOffset + this.height / 2) + "px";
+        this.rightBox.style.left = (globals.boxOffset + this.width) + "px";
+        this.bottomBox.style.top = (globals.boxOffset + this.height) + "px";
+        this.bottomBox.style.left = (globals.boxOffset + this.width / 2) + "px";
+    },
+    
+    resizeCanvas(width, height) {        
+        const canvas = document.getElementById("canvas");
+        if (width) {
+            canvas.width = width;
+            this.width = width;
+        }
+        if (height) {
+            canvas.height = height;    
+            this.height = height;
+        }                
+        this.moveBoxes();
+        // update canvas size indicator
+        document.getElementById("xy-drawing-area").innerText = this.width + " x " + this.height + " px";
     }
 }
 
@@ -374,9 +462,9 @@ const editBoxManager = {
 function setup(){
     // add event listeners to keep html clean  
     const drawingArea = document.getElementById("drawing-area");
-    drawingArea.addEventListener("mousedown", eventManager.processEvent);
-    drawingArea.addEventListener("mousemove", eventManager.processEvent);
-    drawingArea.addEventListener("mouseup", eventManager.processEvent);
+    drawingArea.addEventListener("mousedown", event => eventManager.processEvent(event));
+    drawingArea.addEventListener("mousemove", event => eventManager.processEvent(event));
+    drawingArea.addEventListener("mouseup", event => eventManager.processEvent(event));
     
     const toolInputs = [...document.querySelectorAll("input[name=tool]")];
     toolInputs.forEach(element => element.addEventListener("change", configManager.updateTool));
@@ -402,14 +490,16 @@ function setup(){
     document.querySelector(".color-active#secondary").style.backgroundColor = "#ffffff";
     
                             
-    // provide the coordinates offset of the canvas to the coordinates manager
+    // initialize canvas and get client coordiantes
     const canvas = document.getElementById("canvas");
+    canvasManager.init();
     const rect = canvas.getBoundingClientRect();
     coordinatesManager.offsetX = rect.left;
     coordinatesManager.offsetY = rect.top; 
     
     // get the only render context that will be used throughout the app
     const ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
     drawingManager.ctx = ctx
     undoRedoManager.ctx = ctx;
     undoRedoManager.size = [canvas.width, canvas.height];
