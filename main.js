@@ -18,7 +18,7 @@ const eventManager = {
                 this.resize = targetClass.split(" ")[0].split("-")[0];
             } else {
                 drawingManager.ctx.strokeStyle = event.button === 2 
-                    ? configManager.secondaryColor
+                    ? configManager.secondaryColors
                     : configManager.primaryColor;
             }
         }
