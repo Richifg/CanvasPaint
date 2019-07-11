@@ -20,6 +20,7 @@
     
     /* MISC */
     --border-width: 2px;
+    --hover-color: cyan;
 }
 
 *{
@@ -111,7 +112,7 @@ header {
 .tool-icon:hover{
     width: 28px;
     height: 28px;
-    border: 1px solid cyan;
+    border: 1px solid var(--hover-color);
     border-radius: 5px;
 }
 
@@ -161,7 +162,7 @@ header {
 .hidden-input:checked + .width-icon,
 .width-icon:hover{
     height: 33px;
-    border: 1px solid cyan;
+    border: 1px solid var(--hover-color);
     border-radius: 5px;
 }
 
@@ -191,7 +192,7 @@ header {
 
 .hidden-input:checked +.color-active,
 .color-active-container:hover .color-active {
-    border-color:cyan;
+    border-color: var(--hover-color);
     width: 35px;
     height: 35px;
 }
@@ -214,7 +215,7 @@ header {
 }
 
 .color-option:hover {
-    border: 2px cyan solid;
+    border: 2px var(--hover-color) solid;
 }
 
 .color-custom {
@@ -233,7 +234,7 @@ header {
 }
 
 .color-picker-container:hover .color-picker{
-    border-color: cyan;
+    border-color: var(--hover-color);
 }
 
 /* =================== */
@@ -269,7 +270,7 @@ main {
 }
 
 .box:hover, .canvas-box:hover {
-    background-color: cyan;
+    background-color: var(--hover-color);
     border-color: blue;
     width: 6px;
     height: 6px;
