@@ -6,19 +6,19 @@ const globals = {
 // processes all mouse events happening inside the drawing area
 const eventManager = {
     // resive of canvas and shapes requires to keep track of which 
-    // points is being edited through events
+    // points is being edited across events
     resize: "",
     
     // redirects the event to the appropiate function
     processEvent(event) {
-        console.log('undo count: ' + undoRedoManager.undoStack.length + ' ' + 'redo count: ' + undoRedoManager.redoStack.length);
+        console.log(configManager.width);
         if (event.type === "mousedown") {
             const targetClass = event.target.className;
             if (targetClass.includes("canvas")) {
                 this.resize = targetClass.split(" ")[0].split("-")[0];
             } else {
                 drawingManager.ctx.strokeStyle = event.button === 2 
-                    ? configManager.secondaryColors
+                    ? configManager.secondaryColor
                     : configManager.primaryColor;
             }
         }
@@ -43,21 +43,36 @@ const eventManager = {
         const [x, y] = coordinatesManager.updateCoordinates(event.clientX, event.clientY);
         
         switch(event.type){
-            case "mousedown":            
-                undoRedoManager.addUndo();
-                drawingManager.drawPen(x, y, true);
-                break;
-            case "mousemove":
-                if (event.buttons !== 0) {
-                    drawingManager.drawPen(x, y);
-                }
-                break;
+        case "mousedown":            
+            undoRedoManager.addUndo();
+            drawingManager.drawPen(x, y, true);
+            break;
+        case "mousemove":
+            if (event.buttons !== 0) {
+                drawingManager.drawPen(x, y);
+            }
+            break;
         }
     },
     
     processPaintEvent(event) {},
     
-    processEraserEvent(event) {},
+    processEraserEvent(event) {                
+        if (event.type === "mousedown") {
+            // eraser always uses secondary color
+            drawingManager.ctx.strokeStyle = configManager.secondaryColor;
+            // and is thicker than current width
+            configManager.updateWidth(configManager.width + 10);
+        }    
+        
+        if (event.type === "mouseup"){
+            // restore correct width
+            configManager.updateWidth();
+        }
+
+        // other than that, it behaves exactly like a pen, for now...
+        this.processPenEvent(event)
+    },
     
     processShapeEvent(event) {
         // get current cursor coordinates and selected tool
@@ -123,6 +138,7 @@ const eventManager = {
         if (event.type === "mouseup") {            
             this.resize = "";
             undoRedoManager.undoStack.pop();
+            configManager.updateConfig();
         }
     }
 };
@@ -138,7 +154,8 @@ const drawingManager = {
     end: [0, 0],
     center: [0, 0],
     
-    drawPen(x, y, begin = false){
+    
+    drawPen(x, y, begin = false) {
         if (begin) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, y);            
@@ -249,6 +266,9 @@ const coordinatesManager = {
 
 // keeps track of selected tool, width and colors
 const configManager = {
+    // render context of the canvas (initialized on setup)      
+    ctx: undefined,
+    
     tool: "pen",
     
     width: 1,
@@ -261,24 +281,29 @@ const configManager = {
     
     updateTool() {
         const currentTool = document.querySelector("input[name=tool]:checked").value
-        if (configManager.tool !== currentTool) {
-            configManager.tool = currentTool;
+        if (this.tool !== currentTool) {
+            this.tool = currentTool;
             // cleanup in case a shape was being drawn
             editBoxManager.deleteBoxes();
         }
     },
     
-    updateWidth() {
-        const currentWidth = document.querySelector("input[name=width]:checked").value;
-        if (configManager.width !== currentWidth) {
-            configManager.width = currentWidth;
+    updateWidth(width = 0) {
+        const currentWidth = width || parseInt(document.querySelector("input[name=width]:checked").value);
+        if (this.width !== currentWidth) {
+            this.width = currentWidth;
             drawingManager.ctx.lineWidth = currentWidth;
             
             // check if a shape is currently being drawn and redraw it with new width
-            if (["line", "square", "circle", "triangle"].indexOf(configManager.tool) !== -1) {
+            if (["line", "square", "circle", "triangle"].indexOf(this.tool) !== -1) {
                 drawingManager.redrawShape();
             }
         }
+    },
+    
+    updateConfig() {
+        this.ctx.lineCap = "round";
+        this.ctx.lineWidth = this.width;
     },
     
     updateColor(event) {
@@ -286,17 +311,17 @@ const configManager = {
         const newColor = event.target.style.backgroundColor;
         document.getElementById(activeColorID).style.backgroundColor = newColor;
         document.querySelector("input[type=color]").value = newColor;
-        configManager[activeColorID + "Color"] = newColor;
+        this[activeColorID + "Color"] = newColor;
     },
     
     addNewColor(event) {
         const newColor = event.target.value;
-        configManager.customColors.pop();
-        configManager.customColors.unshift(newColor);
+        this.customColors.pop();
+        this.customColors.unshift(newColor);
         const customColors = [...document.querySelectorAll(".color-custom")];
-        customColors.forEach((element, index) => element.style.backgroundColor = configManager.customColors[index]);
+        customColors.forEach((element, index) => element.style.backgroundColor = this.customColors[index]);
         // simulate an event to recycle updateColor function 
-        configManager.updateColor({target : {style: {backgroundColor: newColor}}});
+        this.updateColor({target : {style: {backgroundColor: newColor}}});
     }
 };
 
@@ -307,35 +332,37 @@ const undoRedoManager = {
     size: [0, 0],
     
     // stacks holding the images to undo/redo
-    undoStack: [],    
+    undoStack: [],
     redoStack: [],    
     
     // pushes current image into undo stack, enables button and cleans redo stack
     addUndo(){
         this.undoStack.push(this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height));
         document.getElementById("undo-button").removeAttribute("disabled");
-        this.redoStack = [];   
+        this.redoStack = [];        
         document.getElementById("redo-button").setAttribute("disabled","");
     },
     
     // undo redo logic
-    undo(){        
-        // clean resize boxes if existent
-        editBoxManager.deleteBoxes();
-        
-        // add about to be undoed image to redo stack and enable button
-        const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
-        this.redoStack.push(currentImage);                
-        document.getElementById("redo-button").removeAttribute("disabled");
-        
-        // pop element from stack and restore canvas
-        const lastImage = this.undoStack.pop();        
-        this.ctx.putImageData(lastImage, 0, 0);
-        
-        // disable undo button if needed
-        if (!this.undoStack.length) { 
-            document.getElementById("undo-button").setAttribute("disabled","");
-        }                
+    undo(){
+        if (this.undoStack.length) {
+            // clean resize boxes if existent
+            editBoxManager.deleteBoxes();
+
+            // add about to be undoed image to redo stack and enable button
+            const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
+            this.redoStack.push(currentImage);                
+            document.getElementById("redo-button").removeAttribute("disabled");
+
+            // pop element from stack and restore canvas
+            const lastImage = this.undoStack.pop();        
+            this.ctx.putImageData(lastImage, 0, 0);
+
+            // disable undo button if needed
+            if (!this.undoStack.length) { 
+                document.getElementById("undo-button").setAttribute("disabled","");
+            }
+        }
     }, 
     softUndo() {        
         // called by the shape functions when being redrawn
@@ -344,19 +371,21 @@ const undoRedoManager = {
             this.ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);
         }
     },
-    redo(){
-        // add about to be redoed image to undo stack and enable button
-        const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
-        this.undoStack.push(currentImage);                
-        document.getElementById("undo-button").removeAttribute("disabled");
-        
-        // pop element from stack and restore canvas
-        const lastImage = this.redoStack.pop();        
-        this.ctx.putImageData(lastImage, 0, 0);
-        
-        // disable redo button if needed
-        if (!this.redoStack.length) { 
-            document.getElementById("redo-button").setAttribute("disabled","");
+    redo(){        
+        if (this.redoStack.length) {
+            // add about to be redoed image to undo stack and enable button
+            const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
+            this.undoStack.push(currentImage);                
+            document.getElementById("undo-button").removeAttribute("disabled");
+
+            // pop element from stack and restore canvas
+            const lastImage = this.redoStack.pop();        
+            this.ctx.putImageData(lastImage, 0, 0);
+
+            // disable redo button if needed
+            if (!this.redoStack.length) { 
+                document.getElementById("redo-button").setAttribute("disabled","");
+            }
         }
     },
 };
@@ -477,13 +506,13 @@ function setup(){
     drawingArea.addEventListener("mouseup", event => eventManager.processEvent(event));
     
     const toolInputs = [...document.querySelectorAll("input[name=tool]")];
-    toolInputs.forEach(element => element.addEventListener("change", configManager.updateTool));
+    toolInputs.forEach(element => element.addEventListener("change", () => configManager.updateTool()));
     
     const widthInputs = [...document.querySelectorAll("input[name=width]")];
-    widthInputs.forEach(element => element.addEventListener("change", configManager.updateWidth));
+    widthInputs.forEach(element => element.addEventListener("change", () => configManager.updateWidth()));
     
     const colorOptions = [...document.querySelectorAll(".color-option")];
-    colorOptions.forEach(element => element.addEventListener("mouseup", configManager.updateColor));
+    colorOptions.forEach(element => element.addEventListener("mouseup", (event) => configManager.updateColor(event)));
     
     const colorInput = document.querySelector("input[type=color]");
     colorInput.addEventListener("change", configManager.addNewColor);
@@ -512,5 +541,6 @@ function setup(){
     ctx.lineCap = "round";
     drawingManager.ctx = ctx
     undoRedoManager.ctx = ctx;
+    configManager.ctx = ctx;
 }
 setup();
