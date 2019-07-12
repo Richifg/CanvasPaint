@@ -3,6 +3,9 @@ const globals = {
   boxOffset: 7.5,
 };
 
+// 2d context of the canvas, initialized on seutp
+let ctx;
+
 // processes all mouse events happening inside the drawing area
 const eventManager = {
   // resive of canvas and shapes requires to keep track of which
@@ -16,12 +19,11 @@ const eventManager = {
       if (targetClass.includes('canvas')) {
         this.resize = targetClass.split(' ')[0].split('-')[0];
       } else {
-        drawingManager.ctx.strokeStyle = event.button === 2
+        ctx.strokeStyle = event.button === 2
           ? configManager.secondaryColor
           : configManager.primaryColor;
       }
     }
-
     if (['corner', 'right', 'bottom'].includes(this.resize)) {
       this.processCanvasEvent(event);
     } else {
@@ -56,12 +58,23 @@ const eventManager = {
     }
   },
 
-  processPaintEvent() {},
+  processPaintEvent(event) {
+    const [x, y] = coordinatesManager.updateCoordinates(event.clientX, event.clientY);
+    if (event.type === 'mousedown') {
+      const color = event.button === 2
+        ? configManager.secondaryColor
+        : configManager.primaryColor;
+      const rgbColor = color.replace(/[rgba()\s]/g, '').split(',').map(str => parseInt(str, 10));
+      const currentImage = ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
+      // canvas uses a weird color format where alpha is 0-255
+      drawingManager.paint(x, y, [...rgbColor, 255], currentImage);
+    }
+  },
 
   processEraserEvent(event) {
     if (event.type === 'mousedown') {
       // eraser always uses secondary color
-      drawingManager.ctx.strokeStyle = configManager.secondaryColor;
+      ctx.strokeStyle = configManager.secondaryColor;
       // and is thicker than current width
       configManager.updateWidth(configManager.width + 10);
     }
@@ -150,9 +163,6 @@ const eventManager = {
 
 // draws on the canvas
 const drawingManager = {
-  // render context of the canvas (initialized on setup)
-  ctx: undefined,
-
   // start, end and center coordinates of the current drawing
   // used on shapes like line, square and circle
   start: [0, 0],
@@ -162,11 +172,11 @@ const drawingManager = {
 
   drawPen(x, y, begin = false) {
     if (begin) {
-      this.ctx.beginPath();
-      this.ctx.moveTo(x, y);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
     }
-    this.ctx.lineTo(x, y);
-    this.ctx.stroke();
+    ctx.lineTo(x, y);
+    ctx.stroke();
   },
   drawShape(tool, x, y, position = 'end', isBeginning = false) {
     // update shape start on mouse down
@@ -199,50 +209,108 @@ const drawingManager = {
     }
   },
   drawLine() {
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.start[0], this.start[1]);
-    this.ctx.lineTo(this.end[0], this.end[1]);
-    this.ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(this.start[0], this.start[1]);
+    ctx.lineTo(this.end[0], this.end[1]);
+    ctx.stroke();
   },
   drawSquare() {
     // not using strokeRect due to weird behavior at the meeting point of the square lines
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.start[0], this.start[1]);
-    this.ctx.lineTo(this.end[0], this.start[1]);
-    this.ctx.lineTo(this.end[0], this.end[1]);
-    this.ctx.lineTo(this.start[0], this.end[1]);
-    this.ctx.lineTo(this.start[0], this.start[1]);
+    ctx.beginPath();
+    ctx.moveTo(this.start[0], this.start[1]);
+    ctx.lineTo(this.end[0], this.start[1]);
+    ctx.lineTo(this.end[0], this.end[1]);
+    ctx.lineTo(this.start[0], this.end[1]);
+    ctx.lineTo(this.start[0], this.start[1]);
     // last line used to force line caps to meet properly
-    this.ctx.lineTo(this.end[0], this.start[1]);
-    this.ctx.stroke();
+    ctx.lineTo(this.end[0], this.start[1]);
+    ctx.stroke();
   },
   drawCircle() {
     // center and radii of the elipse
     const [cX, cY] = [...this.center];
     const [rX, rY] = [Math.abs(this.start[0] - cX), Math.abs(this.start[1] - cY)];
 
-    this.ctx.beginPath();
-    this.ctx.ellipse(cX, cY, rX, rY, 0, 0, Math.PI * 2);
-    this.ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(cX, cY, rX, rY, 0, 0, Math.PI * 2);
+    ctx.stroke();
   },
   drawTriangle() {
     const p1 = [this.center[0], this.start[1]];
     const p2 = [this.start[0], this.end[1]];
     const p3 = [...this.end];
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(...p1);
-    this.ctx.lineTo(...p2);
-    this.ctx.lineTo(...p3);
-    this.ctx.lineTo(...p1);
+    ctx.beginPath();
+    ctx.moveTo(...p1);
+    ctx.lineTo(...p2);
+    ctx.lineTo(...p3);
+    ctx.lineTo(...p1);
     // last line used to force line caps to meet properly
-    this.ctx.lineTo(...p2);
-    this.ctx.stroke();
+    ctx.lineTo(...p2);
+    ctx.stroke();
   },
-
   redrawShape() {
     undoRedoManager.softUndo();
     this.ctx.stroke();
+  },
+
+  // special function for the paint tool
+  paint(x, y, newColor, image) {
+    undoRedoManager.addUndo();
+    const { width, height } = image;
+    const oldColor = this.getPixelColor(x, y, image);
+
+    // paint over only if initial pixel is has different color
+    if (!this.areColorsEqual(oldColor, newColor)) {
+      const pixelsToColor = [[x, y]];
+      console.log('gonna start');
+      while (pixelsToColor.length) {
+        const [pX, pY] = pixelsToColor.shift();
+        if (this.areColorsEqual(oldColor, this.getPixelColor(pX, pY, image))) {
+          this.setPixelColor(pX, pY, image, newColor);
+
+          const upPixel = [pX, pY - 1];
+          if (upPixel[1] >= 0) { pixelsToColor.push(upPixel); }
+
+          const rightPixel = [pX + 1, pY];
+          if (rightPixel[0] < width) { pixelsToColor.push(rightPixel); }
+
+          const downPixel = [pX, pY + 1];
+          if (downPixel[1] < height) { pixelsToColor.push(downPixel); }
+
+          const leftPixel = [pX - 1, pY];
+          if (leftPixel[0] >= 0) { pixelsToColor.push(leftPixel); }
+        }
+      }
+      console.log('done');
+      ctx.putImageData(image, 0, 0);
+    }
+  },
+
+  getPixelIndex(x, y, image) {
+    return y * 4 * image.width + 4 * x;
+  },
+
+  getPixelColor(x, y, image) {
+    const pixelIndex = this.getPixelIndex(x, y, image);
+    return [
+      image.data[pixelIndex],
+      image.data[pixelIndex + 1],
+      image.data[pixelIndex + 2],
+      image.data[pixelIndex + 3],
+    ];
+  },
+
+  setPixelColor(x, y, image, color) {
+    const pixelIndex = this.getPixelIndex(x, y, image);
+    image.data[pixelIndex] = color[0];
+    image.data[pixelIndex + 1] = color[1];
+    image.data[pixelIndex + 2] = color[2];
+    image.data[pixelIndex + 3] = color[3];
+  },
+
+  areColorsEqual(color1, color2) {
+    return color1.every((val, index) => val === color2[index]);
   },
 };
 
@@ -272,18 +340,15 @@ const coordinatesManager = {
 
 // keeps track of selected tool, width and colors
 const configManager = {
-  // render context of the canvas (initialized on setup)
-  ctx: undefined,
-
   tool: 'pen',
 
   width: 1,
 
-  primaryColor: '#000000',
+  primaryColor: 'rgba(0,0,0)',
 
-  secondaryColor: '#ffffff',
+  secondaryColor: 'rgba(255,255,255)',
 
-  customColors: Array(10).fill('#ffffff'),
+  customColors: Array(10).fill('rgba(255,255,255'),
 
   updateTool() {
     const currentTool = document.querySelector('input[name=tool]:checked').value;
@@ -298,7 +363,7 @@ const configManager = {
     const currentWidth = width || parseInt(document.querySelector('input[name=width]:checked').value, 10);
     if (this.width !== currentWidth) {
       this.width = currentWidth;
-      drawingManager.ctx.lineWidth = currentWidth;
+      ctx.lineWidth = currentWidth;
 
       // check if a shape is currently being drawn and redraw it with new width
       if (['line', 'square', 'circle', 'triangle'].indexOf(this.tool) !== -1) {
@@ -308,8 +373,8 @@ const configManager = {
   },
 
   updateConfig() {
-    this.ctx.lineCap = 'round';
-    this.ctx.lineWidth = this.width;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = this.width;
   },
 
   updateColor(event) {
@@ -325,18 +390,17 @@ const configManager = {
     this.customColors.pop();
     this.customColors.unshift(newColor);
     const customColors = [...document.querySelectorAll('.color-custom')];
-    customColors.forEach((element, index) => {
-      element.style.backgroundColor = this.customColors[index];
-    });
+    customColors.forEach((element, index) => element.style.backgroundColor = this.customColors[index]);    
+    // colors returned from color picker are in hex format
+    // have to read color from css to get rbg format instead of using newColor variable    
+    const newColorRgb = document.querySelector('.color-custom-1').style.backgroundColor;
     // simulate an event to recycle updateColor function
-    this.updateColor({ target: { style: { backgroundColor: newColor } } });
+    this.updateColor({ target: { style: { backgroundColor: newColorRgb } } });
   },
 };
 
 // mantains the undo/redo stack
 const undoRedoManager = {
-  // size and render context of the canvas (initialized on setup)
-  ctx: undefined,
   size: [0, 0],
 
   // stacks holding the images to undo/redo
@@ -345,7 +409,7 @@ const undoRedoManager = {
 
   // pushes current image into undo stack, enables button and cleans redo stack
   addUndo() {
-    this.undoStack.push(this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height));
+    this.undoStack.push(ctx.getImageData(0, 0, canvasManager.width, canvasManager.height));
     document.getElementById('undo-button').removeAttribute('disabled');
     this.redoStack = [];
     document.getElementById('redo-button').setAttribute('disabled', '');
@@ -358,13 +422,13 @@ const undoRedoManager = {
       editBoxManager.deleteBoxes();
 
       // add about to be undoed image to redo stack and enable button
-      const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
+      const currentImage = ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
       this.redoStack.push(currentImage);
       document.getElementById('redo-button').removeAttribute('disabled');
 
       // pop element from stack and restore canvas
       const lastImage = this.undoStack.pop();
-      this.ctx.putImageData(lastImage, 0, 0);
+      ctx.putImageData(lastImage, 0, 0);
 
       // disable undo button if needed
       if (!this.undoStack.length) {
@@ -376,19 +440,19 @@ const undoRedoManager = {
     // called by the shape functions when being redrawn
     // similar to regular undo but doesn't alter the stacks
     if (this.undoStack.length) {
-      this.ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);
+      ctx.putImageData(this.undoStack[this.undoStack.length - 1], 0, 0);
     }
   },
   redo() {
     if (this.redoStack.length) {
       // add about to be redoed image to undo stack and enable button
-      const currentImage = this.ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
+      const currentImage = ctx.getImageData(0, 0, canvasManager.width, canvasManager.height);
       this.undoStack.push(currentImage);
       document.getElementById('undo-button').removeAttribute('disabled');
 
       // pop element from stack and restore canvas
       const lastImage = this.redoStack.pop();
-      this.ctx.putImageData(lastImage, 0, 0);
+      ctx.putImageData(lastImage, 0, 0);
 
       // disable redo button if needed
       if (!this.redoStack.length) {
@@ -523,18 +587,18 @@ function setup() {
   colorOptions.forEach(element => element.addEventListener('mouseup', event => configManager.updateColor(event)));
 
   const colorInput = document.querySelector('input[type=color]');
-  colorInput.addEventListener('change', configManager.addNewColor);
+  colorInput.addEventListener('change', event => configManager.addNewColor(event));
 
 
   // add preset colors to keep html clean as well
-  const presetColor = ['#000000', '#7f7f7f', '#880015', '#ed1c24', '#ff7f27',
-    '#fff200', '#22b14c', '#00a2e8', '#3f48cc', '#a249a4',
-    '#ffffff', '#c3c3c3', '#b97a57', '#ffafc9', '#ffc90e',
-    '#efe4b0', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7'];
+  const presetColor = [
+    'rgb(000, 000, 000)', 'rgb(127, 127, 127)', 'rgb(136, 000, 021)', 'rgb(237, 028, 036)', 'rgb(255, 127, 039)',
+    'rgb(255, 242, 000)', 'rgb(034, 177, 076)', 'rgb(000, 162, 232)', 'rgb(063, 072, 204)', 'rgb(162, 073, 164)',
+    'rgb(255, 255, 255)', 'rgb(195, 195, 195)', 'rgb(185, 122, 087)', 'rgb(255, 175, 201)', 'rgb(255, 201, 14)',
+    'rgb(239, 228, 176)', 'rgb(181, 230, 029)', 'rgb(153, 217, 234)', 'rgb(112, 146, 190)', 'rgb(200, 191, 231)',
+  ];
   const presetColorElements = [...document.querySelectorAll('.color-preset')];
-  presetColorElements.forEach((element, index) => {
-    element.style.backgroundColor = presetColor[index];
-  });
+  presetColorElements.forEach((element, index) => element.style.backgroundColor = presetColor[index]);
   document.querySelector('.color-active#primary').style.backgroundColor = '#000000';
   document.querySelector('.color-active#secondary').style.backgroundColor = '#ffffff';
 
@@ -547,10 +611,8 @@ function setup() {
   coordinatesManager.offsetY = rect.top;
 
   // get the only render context that will be used throughout the app
-  const ctx = canvas.getContext('2d');
-  ctx.lineCap = 'round';
-  drawingManager.ctx = ctx;
-  undoRedoManager.ctx = ctx;
-  configManager.ctx = ctx;
+  const context2D = canvas.getContext('2d');
+  context2D.lineCap = 'round';
+  ctx = context2D;
 }
 setup();
