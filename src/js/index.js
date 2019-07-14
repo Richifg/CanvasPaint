@@ -1,3 +1,6 @@
+
+import '../css/styles.css';
+
 const globals = {
   // main padding - half box size
   boxOffset: 7.5,
