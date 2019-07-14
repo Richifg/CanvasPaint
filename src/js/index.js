@@ -1,5 +1,15 @@
-
 import '../css/styles.css';
+
+import {
+  drawingArea,
+  toolInputs,
+  widthInputs,
+  activeColorInputs,
+  colorPickerInput,
+  customColorDisplays,
+  cursorCoordinatesDisplay,
+  canvasSizeDisplay,
+} from './dom-loader';
 
 const globals = {
   // main padding - half box size
@@ -266,7 +276,6 @@ const drawingManager = {
     // paint over only if initial pixel is has different color
     if (!this.areColorsEqual(oldColor, newColor)) {
       const pixelsToColor = [[x, y]];
-      console.log('gonna start');
       while (pixelsToColor.length) {
         const [pX, pY] = pixelsToColor.shift();
         if (this.areColorsEqual(oldColor, this.getPixelColor(pX, pY, image))) {
@@ -285,7 +294,6 @@ const drawingManager = {
           if (leftPixel[0] >= 0) { pixelsToColor.push(leftPixel); }
         }
       }
-      console.log('done');
       ctx.putImageData(image, 0, 0);
     }
   },
@@ -334,7 +342,7 @@ const coordinatesManager = {
     this.y = cursorY - this.offsetY;
 
     // update the coordinates indicator as well
-    document.getElementById('xy-cursor').innerText = `${this.x} x ${this.y} px`;
+    cursorCoordinatesDisplay.innerText = `${this.x} x ${this.y} px`;
 
     // return new coordiantes
     return [this.x, this.y];
@@ -354,7 +362,7 @@ const configManager = {
   customColors: Array(10).fill('rgba(255,255,255'),
 
   updateTool() {
-    const currentTool = document.querySelector('input[name=tool]:checked').value;
+    const currentTool = toolInputs.find(element => element.checked).value;
     if (this.tool !== currentTool) {
       this.tool = currentTool;
       // cleanup in case a shape was being drawn
@@ -363,7 +371,7 @@ const configManager = {
   },
 
   updateWidth(width = 0) {
-    const currentWidth = width || parseInt(document.querySelector('input[name=width]:checked').value, 10);
+    const currentWidth = width || parseInt(widthInputs.find(element => element.checked).value, 10);
     if (this.width !== currentWidth) {
       this.width = currentWidth;
       ctx.lineWidth = currentWidth;
@@ -381,21 +389,22 @@ const configManager = {
   },
 
   updateColor(event) {
-    const activeColorID = document.querySelector('input[name=color]:checked').value;
+    const activeColorElement = activeColorInputs.find(element => element.checked);
     const newColor = event.target.style.backgroundColor;
-    document.getElementById(activeColorID).style.backgroundColor = newColor;
-    document.querySelector('input[type=color]').value = newColor;
-    this[`${activeColorID}Color`] = newColor;
+    activeColorElement.style.backgroundColor = newColor;
+    colorPickerInput.value = newColor;
+    this[`${activeColorElement.id}Color`] = newColor;
   },
 
   addNewColor(event) {
     const newColor = event.target.value;
     this.customColors.pop();
     this.customColors.unshift(newColor);
-    const customColors = [...document.querySelectorAll('.color-custom')];
-    customColors.forEach((element, index) => element.style.backgroundColor = this.customColors[index]);    
+    customColorDisplays.forEach(
+      (element, index) => { element.style.backgroundColor = this.customColors[index]; },
+    );
     // colors returned from color picker are in hex format
-    // have to read color from css to get rbg format instead of using newColor variable    
+    // have to read color from css to get rbg format instead of using newColor variable
     const newColorRgb = document.querySelector('.color-custom-1').style.backgroundColor;
     // simulate an event to recycle updateColor function
     this.updateColor({ target: { style: { backgroundColor: newColorRgb } } });
@@ -482,7 +491,7 @@ const editBoxManager = {
       const [x, y] = drawingManager[position];
       editBox.style.left = `${x + globals.boxOffset}px`;
       editBox.style.top = `${y + globals.boxOffset}px`;
-      document.getElementById('drawing-area').appendChild(editBox);
+      drawingArea.appendChild(editBox);
 
       // keep track of created boxes
       editBoxManager.boxes.push(editBox);
@@ -528,8 +537,6 @@ const canvasManager = {
   },
 
   createBoxes() {
-    const drawingArea = document.getElementById('drawing-area');
-
     const rightBox = document.createElement('div');
     rightBox.className = 'right-box canvas-box';
     drawingArea.appendChild(rightBox);
@@ -568,29 +575,25 @@ const canvasManager = {
     }
     this.moveBoxes();
     // update canvas size indicator
-    document.getElementById('xy-drawing-area').innerText = `${this.width} x ${this.height} px`;
+    canvasSizeDisplay.innerText = `${this.width} x ${this.height} px`;
   },
 };
 
 // intializes some manager variables after the document is loaded
 function setup() {
   // add event listeners here to keep html clean
-  const drawingArea = document.getElementById('drawing-area');
   drawingArea.addEventListener('mousedown', event => eventManager.processEvent(event));
   drawingArea.addEventListener('mousemove', event => eventManager.processEvent(event));
   drawingArea.addEventListener('mouseup', event => eventManager.processEvent(event));
 
-  const toolInputs = [...document.querySelectorAll('input[name=tool]')];
   toolInputs.forEach(element => element.addEventListener('change', () => configManager.updateTool()));
 
-  const widthInputs = [...document.querySelectorAll('input[name=width]')];
   widthInputs.forEach(element => element.addEventListener('change', () => configManager.updateWidth()));
 
   const colorOptions = [...document.querySelectorAll('.color-option')];
   colorOptions.forEach(element => element.addEventListener('mouseup', event => configManager.updateColor(event)));
 
-  const colorInput = document.querySelector('input[type=color]');
-  colorInput.addEventListener('change', event => configManager.addNewColor(event));
+  colorPickerInput.addEventListener('change', event => configManager.addNewColor(event));
 
 
   // add preset colors to keep html clean as well
@@ -601,7 +604,9 @@ function setup() {
     'rgb(239, 228, 176)', 'rgb(181, 230, 029)', 'rgb(153, 217, 234)', 'rgb(112, 146, 190)', 'rgb(200, 191, 231)',
   ];
   const presetColorElements = [...document.querySelectorAll('.color-preset')];
-  presetColorElements.forEach((element, index) => element.style.backgroundColor = presetColor[index]);
+  presetColorElements.forEach(
+    (element, index) => { element.style.backgroundColor = presetColor[index]; },
+  );
   document.querySelector('.color-active#primary').style.backgroundColor = '#000000';
   document.querySelector('.color-active#secondary').style.backgroundColor = '#ffffff';
 
