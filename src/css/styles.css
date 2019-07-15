@@ -260,7 +260,7 @@ main {
     position: absolute;
 }
 
-.box, .canvas-box{    
+.box{    
     background-color: white;
     border: solid;
     border-width: 1px;
@@ -269,7 +269,7 @@ main {
     position: absolute;
 }
 
-.box:hover, .canvas-box:hover {
+.box:hover{
     background-color: var(--hover-color);
     border-color: blue;
     width: 6px;
