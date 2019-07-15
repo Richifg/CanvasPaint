@@ -10,20 +10,20 @@
         <!-- General -->
         <div class="header-section clmn">
 			<div class="tool-group-container">
-                <label class="tool-container">
-					<input class="hidden-input" id="undo-button" type="image">
+                <label class="tool-container" id="save-button">
+					<input class="hidden-input">
                     <img class="tool-icon" src="https://bit.ly/2TZ0ne7">
                 </label>
-				<label class="tool-container">                
-					<input class="hidden-input" id="redo-button" type="image">
+				<label class="tool-container" id="import-button">                
+					<input class="hidden-input">
                     <img class="tool-icon" src="https://bit.ly/2TZ0ne7">
 				</label>
-				<label class="tool-container">
-                    <input class="hidden-input" id="undo-button" onclick="undoRedoManager.undo()">
+				<label class="tool-container" id="undo-button">
+                    <input class="hidden-input">
                     <img class="tool-icon" src="assets/Icon_Undo.svg">
                 </label>
-				<label class="tool-container">                
-					<input class="hidden-input" id="redo-button" onclick="undoRedoManager.redo()">
+				<label class="tool-container" id="redo-button">                
+					<input class="hidden-input">
                     <img class="tool-icon" src="assets/Icon_Redo.svg">
 				</label>
 			</div>
@@ -164,7 +164,7 @@
     <!-- Drawing Area  -->    
     <main>
         <div id="drawing-area">
-            <canvas id="canvas" oncontextmenu="return false">
+            <canvas id="canvas">
                 <p>Bad news :(</p>
                 <p>An html canvas supporting browser is required to use this application</p>
             </canvas>
