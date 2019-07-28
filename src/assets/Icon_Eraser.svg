@@ -3,20 +3,20 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 25 25" style="enable-background:new 0 0 25 25;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:none;stroke:#FFF2F1;stroke-width:2;stroke-miterlimit:10;}
-	.st1{fill:none;stroke:#FFF2F1;stroke-width:1.1371;stroke-miterlimit:10;}
-	.st2{fill:#FFF2F1;}
-	.st3{fill:none;stroke:#FFF2F1;stroke-miterlimit:10;}
-	.st4{fill:#FFF2F1;stroke:#000000;stroke-width:1.2832;stroke-miterlimit:10;}
-	.st5{fill:#FFF2F1;stroke:#000000;stroke-miterlimit:10;}
-	.st6{fill:#FFF2F1;stroke:#000000;stroke-width:0.9624;stroke-miterlimit:10;}
+	.st0{display:none;}
+	.st1{display:inline;}
+	.st2{fill:none;stroke:#FFF2F1;stroke-width:2;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#FFF2F1;stroke-width:1.1371;stroke-miterlimit:10;}
+	.st4{fill:#FFF2F1;}
+	.st5{fill:none;stroke:#FFF2F1;stroke-miterlimit:10;}
+	.st6{fill:#FBB03B;}
 </style>
-<g id="Background">
-	<rect y="0" width="25" height="25"/>
+<g id="Background" class="st0">
+	<rect y="0" class="st1" width="25" height="25"/>
 </g>
 <g id="Icon">
-	<polygon class="st4" points="11.38,21.66 2,19.2 3.34,14.29 12.8,16.7 	"/>
-	<polygon class="st5" points="24,4.56 15.4,2 3.34,14.29 12.8,16.7 	"/>
-	<polygon class="st6" points="10.71,23.5 12.8,16.7 24,4.56 22.77,9.99 	"/>
+	<path class="st4" d="M1.98,14.48c5.75,5.36,5.36,4.96,5.36,4.96l-0.6,3.17l-5.56-5.16L1.98,14.48z"/>
+	<polygon class="st4" points="2.58,13.89 17.46,1.59 23.02,5.56 7.94,19.05 	"/>
+	<polygon class="st4" points="8.13,19.84 7.54,22.62 22.82,9.33 23.61,6.15 	"/>
 </g>
 </svg>
