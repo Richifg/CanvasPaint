@@ -66,7 +66,7 @@ const drawingManager = {
     state.ctx.lineTo(this.end[0], this.end[1]);
     state.ctx.lineTo(this.start[0], this.end[1]);
     state.ctx.lineTo(this.start[0], this.start[1]);
-    // last line used to force line caps to meet properly
+    // last line used to force line caps to join properly
     state.ctx.lineTo(this.end[0], this.start[1]);
     state.ctx.stroke();
   },

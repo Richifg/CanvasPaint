@@ -33,8 +33,8 @@ const configManager = {
 
       // check if a shape is currently being drawn and redraw it with new width
       if (['line', 'square', 'circle', 'triangle'].indexOf(state.config.tool) !== -1) {
-        drawingManager.redrawShape();
         undoRedoManager.softUndo();
+        drawingManager.redrawShape();
       }
     }
   },
