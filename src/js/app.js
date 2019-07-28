@@ -19,8 +19,8 @@ function setup() {
   // initialize canvas and get client coordinates
   canvasManager.init();
   const rect = canvas.getBoundingClientRect();
-  coordinatesManager.offsetX = rect.left;
-  coordinatesManager.offsetY = rect.top;
+  coordinatesManager.offsetX = parseInt(rect.left, 10);
+  coordinatesManager.offsetY = parseInt(rect.top, 10);
 
   // get the one render context that will be used throughout the app
   const context2D = canvas.getContext('2d');
