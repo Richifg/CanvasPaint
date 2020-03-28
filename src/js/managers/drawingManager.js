@@ -156,7 +156,10 @@ const drawingManager = {
   },
 
   areColorsEqual(color1, color2) {
-    return color1.every((val, index) => val === color2[index]);
+    const colorDiff = color1.reduce(
+      (prev, val, index) => prev + Math.abs(val - color2[index]), 0,
+    );
+    return colorDiff <= 20;
   },
 
   updateState() {
