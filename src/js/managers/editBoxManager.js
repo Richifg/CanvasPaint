@@ -1,5 +1,5 @@
-import { drawingArea } from '../dom-loader';
-import { boxOffset } from '../constants';
+import { drawingArea } from '../utility/elements';
+import { boxOffset } from '../utility/constants';
 import { state } from '../state';
 
 // manages the edit boxes that are created for shapes

@@ -1,5 +1,5 @@
 // these html elements are constantly used by the managers
-// setup queries other elements but those are used once
+// setup queries other elements, but those are used only once
 
 export const drawingArea = document.getElementById('drawing-area');
 
