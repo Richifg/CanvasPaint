@@ -6,4 +6,4 @@ This is hobby project to practice my vanilla js/html/css skills without the use 
 
 Please report any bugs you find!
 
-![Preview](https://res.cloudinary.com/richi/image/upload/v1585431334/previews/canvas-paint-preview.gif)
+![Preview](https://res.cloudinary.com/richi/image/upload/v1585431584/previews/canvas-paint-preview_k0dy6k.gif)
