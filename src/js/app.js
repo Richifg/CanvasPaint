@@ -1,9 +1,10 @@
+// imports for webapck to find
 import '../css/styles.css';
 
 import canvasManager from './managers/canvasManager';
 import undoRedoManager from './managers/undoRedoManager';
 import configManager from './managers/configManager';
-import coordinatesManager from './managers/coordiantesManager';
+import coordinatesManager from './managers/coordinatesManager';
 import eventManager from './managers/eventManager';
 import { state } from './state';
 
@@ -13,7 +14,7 @@ import {
   toolInputs,
   widthInputs,
   colorPickerInput,
-} from './dom-loader';
+} from './utility/elements';
 
 function setup() {
   // initialize canvas and get client coordinates
@@ -63,4 +64,5 @@ function setup() {
   document.querySelector('.color-active#primary').style.backgroundColor = '#000000';
   document.querySelector('.color-active#secondary').style.backgroundColor = '#ffffff';
 }
-setup();
+
+document.addEventListener('DOMContentLoaded', () => setup());

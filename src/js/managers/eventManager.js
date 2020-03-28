@@ -4,7 +4,7 @@ import editBoxManager from './editBoxManager';
 import canvasManager from './canvasManager';
 import undoRedoManager from './undoRedoManager';
 import configManager from './configManager';
-import coordinatesManager from './coordiantesManager';
+import coordinatesManager from './coordinatesManager';
 
 // processes all mouse events happening inside the drawing area
 const eventManager = {

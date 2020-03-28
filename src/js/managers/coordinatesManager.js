@@ -1,4 +1,4 @@
-import { cursorCoordinatesDisplay } from '../dom-loader';
+import { cursorCoordinatesDisplay } from '../utility/elements';
 import { updateState } from '../state';
 
 // updates the x/y coordinates of the cursor on the canvas

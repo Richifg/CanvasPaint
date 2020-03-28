@@ -9,7 +9,7 @@ import {
   activeColorInputs,
   activeColorDisplays,
   customColorDisplays,
-} from '../dom-loader';
+} from '../utility/elements';
 
 // keeps track of selected tool, width and colors
 const configManager = {
