@@ -8,7 +8,7 @@ import coordinatesManager from './coordinatesManager';
 
 // processes all mouse events happening inside the drawing area
 const eventManager = {
-  // resive of canvas and shapes requires to keep track of which
+  // resize of canvas and shapes requires to keep track of which
   // points is being edited across events
   resize: '',
 

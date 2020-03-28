@@ -46,10 +46,11 @@ const configManager = {
 
   updateColor(event) {
     const activeColorElement = activeColorInputs.find(element => element.checked);
-    const newColor = event.target.style.backgroundColor;
+    const newColor = typeof event === 'string'
+      ? event
+      : event.target.style.backgroundColor;
     activeColorDisplays.find(element => element.id === activeColorElement.value)
       .style.backgroundColor = newColor;
-    colorPickerInput.value = newColor;
     this[`${activeColorElement.value}Color`] = newColor;
 
     updateState({ [`${activeColorElement.value}Color`]: newColor }, 'config');
@@ -65,8 +66,7 @@ const configManager = {
     // colors returned from color picker are in hex format
     // have to read color from css to get rbg format instead of using the newColor variable
     const newColorRgb = document.querySelector('.color-custom-1').style.backgroundColor;
-    // simulate an event to recycle updateColor function
-    this.updateColor({ target: { style: { backgroundColor: newColorRgb } } });
+    this.updateColor(newColorRgb);
   },
 };
 
