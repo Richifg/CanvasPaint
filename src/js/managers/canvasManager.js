@@ -1,5 +1,5 @@
-import { canvas, canvasSizeDisplay, drawingArea } from '../dom-loader';
-import { boxOffset } from '../constants';
+import { canvas, canvasSizeDisplay, drawingArea } from '../utility/elements';
+import { boxOffset } from '../utility/constants';
 import { state, updateState } from '../state';
 
 const canvasManager = {

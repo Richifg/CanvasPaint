@@ -1,10 +1,12 @@
+// imports for webapck to find
 import '../css/styles.css';
 
 import canvasManager from './managers/canvasManager';
 import undoRedoManager from './managers/undoRedoManager';
 import configManager from './managers/configManager';
-import coordinatesManager from './managers/coordiantesManager';
+import coordinatesManager from './managers/coordinatesManager';
 import eventManager from './managers/eventManager';
+import { debounceFunction } from './utility/functions';
 import { state } from './state';
 
 import {
@@ -13,7 +15,7 @@ import {
   toolInputs,
   widthInputs,
   colorPickerInput,
-} from './dom-loader';
+} from './utility/elements';
 
 function setup() {
   // initialize canvas and get client coordinates
@@ -34,7 +36,11 @@ function setup() {
 
   toolInputs.forEach(element => element.addEventListener('change', () => configManager.updateTool()));
   widthInputs.forEach(element => element.addEventListener('change', () => configManager.updateWidth()));
-  colorPickerInput.addEventListener('change', event => configManager.addNewColor(event));
+
+  // mac color picker input is silly and triggers the change event on every input instead of when
+  // the color picker is closed, so have to debouce the function to avoid repeat changes ¯\_(ツ)_/¯
+  configManager.addNewColorDebounced = debounceFunction(configManager.addNewColor, 250);
+  colorPickerInput.addEventListener('change', event => configManager.addNewColorDebounced(event));
 
   [...document.querySelectorAll('.color-option')].forEach(
     element => element.addEventListener('mouseup', event => configManager.updateColor(event)),
@@ -63,4 +69,5 @@ function setup() {
   document.querySelector('.color-active#primary').style.backgroundColor = '#000000';
   document.querySelector('.color-active#secondary').style.backgroundColor = '#ffffff';
 }
-setup();
+
+document.addEventListener('DOMContentLoaded', () => setup());

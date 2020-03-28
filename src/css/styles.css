@@ -37,7 +37,7 @@ html, body {
     margin: 0px;
 }
 
-.clmn {
+.col {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -277,7 +277,7 @@ main {
 }
 
 .resize-box, .corner-box{
-    cursor: nw-resize;
+    cursor: nwse-resize;
 }
 
 .move-box {
