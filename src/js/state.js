@@ -29,6 +29,4 @@ export const state = {
 
 export function updateState(newItems, category) {
   state[category] = Object.assign(state[category], newItems);
-  // DEBUG ONLY
-  // if (category !== 'coordinates') console.log(state);
 }
